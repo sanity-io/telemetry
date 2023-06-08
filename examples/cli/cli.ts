@@ -1,66 +1,55 @@
 import { parseArgs } from "node:util"
-import { cliStartEvent } from "./src/packages/telemetry/events"
-import {
-  KnownTelemetryLogEvent,
-  KnownTelemetryTrace,
-  TelemetryLogger,
-  TelemetryTrace,
-} from "./src/packages/telemetry/types"
-import { z, ZodType } from "zod"
-const args = ["-f", "--bar", "b"]
-const options = {
-  foo: {
-    type: "boolean",
-    short: "f",
-  },
-  bar: {
-    type: "string",
-  },
-} as const
-const { values, positionals } = parseArgs({ args, options })
+import { cliInitActionEvent, cliStartEvent } from "@sanity/telemetry/events"
+import { TelemetryEntry, TelemetryLogger } from "@sanity/telemetry"
+import { createCliTelemetryLogger } from "./createCliTelemetryLogger.ts"
 
-function cli(positionals, args, ctx: { telemetry: TelemetryLogger }) {
-  ctx.telemetry.log(cliStartEvent)
+async function resolveConsent() {
+  return process.env.TELEMETRY !== "false"
+}
+// todo make proper unique
+const sessionId = Math.random().toString(32).substring(2)
+
+function submitEntries(entries: TelemetryEntry[]) {
+  return fetch("https://telemetry.sanity.io/api/v1/log", {
+    method: "POST",
+    body: JSON.stringify(entries),
+    // …etc
+  })
 }
 
-const consoleLogger: TelemetryLogger = {
-  trace<Schema extends ZodType>(
-    trace: KnownTelemetryTrace<Schema>
-  ): TelemetryTrace<Schema> {
-    const traceId = Math.random().toString(36).substr(2, 9)
-    return {
-      start() {
-        console.log(
-          `[telemetry][${trace.displayName}@${trace.version}][${traceId}] start`,
-          traceId
-        )
-      },
-      log(data?: unknown) {
-        console.log(
-          `[telemetry][${trace.displayName}@${trace.version}][${traceId}] log`,
-          data
-        )
-      },
-      complete() {
-        console.log(
-          `[telemetry][${trace.displayName}@${trace.version}][${traceId}] complete`
-        )
-      },
-      error(error: Error) {
-        console.log(
-          `[telemetry][${trace.displayName}@${trace.version}][${traceId}] error`,
-          error
-        )
-      },
-    }
+const telemetry = createCliTelemetryLogger(sessionId, {
+  resolveConsent: resolveConsent,
+  submitEntries,
+})
+
+const { values, positionals } = parseArgs({
+  args: ["-f", "--bar", "b"],
+  options: {
+    foo: {
+      type: "boolean",
+      short: "f",
+    },
+    bar: {
+      type: "string",
+    },
   },
-  log<Schema extends ZodType>(
-    event: KnownTelemetryLogEvent<Schema>,
-    data?: z.infer<Schema>
-  ) {
-    console.log(`[telemetry][${event.displayName}@${event.version}] log`, data)
-  },
+})
+
+// imaginary cli entry point
+function cli(
+  args: string[],
+  flags: Record<string, string | boolean | undefined>,
+  ctx: { telemetry: TelemetryLogger }
+) {
+  ctx.telemetry.log(cliStartEvent, { nodeVersion: process.version })
+
+  if (args[0] === "init") {
+    ctx.telemetry.log(cliInitActionEvent)
+    // run init…
+  }
 }
 
-// setup telemetry in cli entry point
-cli(positionals, values, { telemetry: consoleLogger })
+// Run CLI  with telemetry instance in cli context
+cli(positionals, values, {
+  telemetry,
+})

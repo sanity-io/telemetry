@@ -1,7 +1,9 @@
-import { TelemetryLogger } from "../types.ts"
 import { useContext } from "react"
-import { telemetryContext } from "./Provider.tsx"
+import {
+  TelemetryContext,
+  TelemetryContextValue,
+} from "./TelemetryProvider.tsx"
 
-export function useTelemetry(): TelemetryLogger {
-  return useContext(telemetryContext)
+export function useTelemetry(): TelemetryContextValue {
+  return useContext(TelemetryContext)
 }

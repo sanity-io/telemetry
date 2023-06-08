@@ -1,6 +1,6 @@
 import { z, ZodType, ZodUndefined, ZodVoid } from "zod"
 
-export type KnownTelemetryEventName = string & { __type: "TelemetryId" }
+export type KnownTelemetryEventName = string & { __type: "TelemetryName" }
 
 export interface TelemetryLogOptions<Schema extends ZodType | undefined> {
   name: string
@@ -48,62 +48,64 @@ export interface TelemetryLogger {
    * Log a single event, typically a user action, e.g. "Publish"-button clicked
    */
   log<Schema extends ZodType = ZodType>(
-    sessionId: string,
     event: KnownTelemetryLogEvent<Schema>,
     data: z.infer<Schema>
   ): void
-  log<Schema extends ZodUndefined>(
-    sessionId: string,
-    event: KnownTelemetryLogEvent<Schema>
-  ): void
+  log<Schema extends ZodUndefined>(event: KnownTelemetryLogEvent<Schema>): void
 
   /*
    * Trace an operation that may take some time and consist of multiple steps, and that could potentially fail, e.g. request to mutate a document
    * Suitable for use with async/await or Observables
    */
   trace<Schema extends ZodType = ZodType>(
-    sessionId: string,
     event: KnownTelemetryTrace<Schema>
   ): TelemetryTrace<Schema>
 }
-export interface TelemetryManager {
-  logger: TelemetryLogger
+
+export type TelemetryLogEntry = {
+  type: "log"
+  event: string // pre-existing event name
+  sessionId: string
+  createdAt: string
+  data: unknown
 }
 
-export interface StudioTelemetryEvent<Schema extends ZodType> {
-  name: KnownTelemetryLogEvent<Schema>
-  data: z.infer<Schema>
-}
-
-export type StudioTelemetryTraceStartEvent = {
+export type TelemetryTraceStartEntry = {
+  event: string // pre-existing event name
   type: "trace.start"
-  id: string // pre-existing id
+  traceId: string
+  sessionId: string
   createdAt: string
 }
 
-export type StudioTelemetryTraceLogEvent<T = unknown> = {
-  id: string // pre-existing id
+export type TelemetryTraceLogEntry<T = unknown> = {
+  event: string // pre-existing event name
   type: "trace.log"
+  traceId: string
+  sessionId: string
   createdAt: string
   data: T
 }
-export type StudioTelemetryTraceErrorEvent<T = unknown> = {
-  id: string // pre-existing id
+export type TelemetryTraceErrorEntry<T = unknown> = {
+  event: string // pre-existing event name
   type: "trace.error"
+  traceId: string
+  sessionId: string
   createdAt: string
   data: T
 }
-export type StudioTelemetryTraceCompleteEvent<T = unknown> = {
-  id: string // pre-existing id
+export type TelemetryTraceCompleteEntry<T = unknown> = {
+  event: string // pre-existing event name
   type: "trace.complete"
+  traceId: string
+  sessionId: string
   createdAt: string
   data: T
 }
+export type TelemetryTraceEntry =
+  | TelemetryTraceStartEntry
+  | TelemetryTraceLogEntry
+  | TelemetryTraceErrorEntry
+  | TelemetryTraceCompleteEntry
 
-export type StudioTelemetryTraceEvent =
-  | StudioTelemetryTraceStartEvent
-  | StudioTelemetryTraceLogEvent
-  | StudioTelemetryTraceErrorEvent
-  | StudioTelemetryTraceCompleteEvent
-
-export type LoggedEvent = { event: KnownTelemetryEventName; data: unknown }
+export type TelemetryEntry = TelemetryLogEntry | TelemetryTraceEntry

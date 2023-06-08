@@ -22,3 +22,16 @@ export const uploadImageTrace = _defineTraceEvent({
   description: "User uploaded an image to the studio",
   schema: z.object({ imageSize: z.number() }),
 })
+
+export const studioSessionStart = _defineLogEvent({
+  name: "studioSessionStart",
+  version: 1,
+  displayName: "Studio opened",
+  description: "Studio opened by user",
+  schema: z.object({
+    studioVersion: z.string(),
+    pluginVersions: z.array(
+      z.object({ pluginName: z.string(), version: z.string() })
+    ),
+  }),
+})

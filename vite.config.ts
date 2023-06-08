@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@sanity/telemetry": path.resolve(__dirname, "./src"),
+      "@sanity/telemetry/events": path.resolve(__dirname, "./src/events"),
       "@sanity/telemetry/react": path.resolve(__dirname, "./src/react"),
     },
   },

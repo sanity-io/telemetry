@@ -1,9 +1,8 @@
 import { useState } from "react"
-import "./App.css"
 import {
   incrementButtonClickEvent,
-  postCommentTraceEvent,
-} from "@sanity/telemetry"
+  saveCommentTrace,
+} from "@sanity/telemetry/events"
 import { useTelemetry } from "@sanity/telemetry/react"
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -14,33 +13,38 @@ const postComment = async (comment: string) => {
   )
 }
 
-function App() {
+function Studio() {
   const [count, setCount] = useState(0)
 
   // We only interact with the api and don't care how it's set up
-  const telemetry = useTelemetry()
+  const { log, trace, tracePromise } = useTelemetry()
 
   const handleButtonClick = () => {
     setCount((count) => count + 1)
-    telemetry.log(incrementButtonClickEvent, { count: count + 1 })
+    log(incrementButtonClickEvent, { count: count + 1 })
   }
   const handlePostComment = async () => {
-    const result = await telemetry.tracePromise(
-      postCommentTraceEvent,
+    const result = await tracePromise(
+      saveCommentTrace,
       postComment("some comment")
     )
 
-    return setCount((count) => count + 1)
+    console.log('Comment "saved"!')
   }
   return (
-    <>
+    <div style={{ padding: 20 }}>
       <div>
-        <textarea></textarea>
-        <button onClick={handlePostComment}>Post comment</button>
-        <button onClick={handleButtonClick}>count is: {count}</button>
+        <button onClick={handleButtonClick}>Increment!</button>
+        (count is: {count})
       </div>
-    </>
+      <div>
+        <div>
+          <textarea></textarea>
+        </div>
+        <button onClick={handlePostComment}>Post comment</button>
+      </div>
+    </div>
   )
 }
 
-export default App
+export default Studio

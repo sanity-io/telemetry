@@ -5,16 +5,13 @@ import {
   TelemetryLogOptions,
   TelemetryTraceOptions,
 } from "./types.ts"
-import { undefined, z, ZodType, ZodUndefined } from "zod"
-import { createLogger } from "vite"
-import { createBatchedLogger } from "./react/fetchLogger.ts"
-import { consoleLogger } from "./react/consoleLogger.ts"
+import { z, ZodType, ZodUndefined } from "zod"
 
 /**
  * @param options
  * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  */
-export function _defineLogEvent<Schema extends ZodType>(
+export function _defineLogEvent<Schema extends ZodType = ZodUndefined>(
   options: TelemetryLogOptions<Schema>
 ): KnownTelemetryLogEvent<Schema> {
   return {
@@ -26,22 +23,11 @@ export function _defineLogEvent<Schema extends ZodType>(
     schema: (options.schema || z.undefined()) as Schema,
   }
 }
-
-const ev = _defineLogEvent({
-  name: "foo",
-  displayName: "test",
-  description: "ok",
-  version: 1,
-})
-
-consoleLogger.log("xyz", ev)
-const c = z.void()
-
 /**
  * @param options
  * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  * */
-export function _defineTraceEvent<Schema extends ZodType>(
+export function _defineTraceEvent<Schema extends ZodType = ZodUndefined>(
   options: TelemetryTraceOptions<Schema>
 ): KnownTelemetryTrace<Schema> {
   return {
@@ -50,6 +36,6 @@ export function _defineTraceEvent<Schema extends ZodType>(
     version: options.version,
     displayName: options.displayName,
     description: options.description,
-    schema: options.schema,
+    schema: (options.schema || z.undefined()) as Schema,
   }
 }
