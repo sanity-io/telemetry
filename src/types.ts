@@ -64,39 +64,44 @@ export interface TelemetryLogger {
 
 export type TelemetryLogEntry = {
   type: "log"
-  event: string // pre-existing event name
+  event: string // pre-defined event name
+  version: number // version of event
   sessionId: string
   createdAt: string
   data: unknown
 }
 
 export type TelemetryTraceStartEntry = {
-  event: string // pre-existing event name
   type: "trace.start"
+  event: string // pre-defined event name
+  version: number // version of event
   traceId: string
   sessionId: string
   createdAt: string
 }
 
 export type TelemetryTraceLogEntry<T = unknown> = {
-  event: string // pre-existing event name
   type: "trace.log"
+  event: string // pre-defined event name
+  version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string
   data: T
 }
 export type TelemetryTraceErrorEntry<T = unknown> = {
-  event: string // pre-existing event name
   type: "trace.error"
+  event: string // pre-defined event name
+  version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string
   data: T
 }
 export type TelemetryTraceCompleteEntry<T = unknown> = {
-  event: string // pre-existing event name
   type: "trace.complete"
+  event: string // pre-defined event name
+  version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string

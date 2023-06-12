@@ -48,6 +48,7 @@ export function createBatchedLogger(
       type,
       traceId,
       event: trace.name,
+      version: trace.version,
       data,
       createdAt: new Date().toISOString(),
     })
@@ -62,6 +63,7 @@ export function createBatchedLogger(
     pending.push({
       sessionId,
       type,
+      version: event.version,
       event: event.name,
       data,
       createdAt: new Date().toISOString(),
