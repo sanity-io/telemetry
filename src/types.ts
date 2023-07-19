@@ -1,6 +1,6 @@
-import { z, ZodType, ZodUndefined, ZodVoid } from "zod"
+import {z, ZodType, ZodUndefined} from 'zod'
 
-export type KnownTelemetryEventName = string & { __type: "TelemetryName" }
+export type KnownTelemetryEventName = string & {__type: 'TelemetryName'}
 
 export interface TelemetryLogOptions<Schema extends ZodType | undefined> {
   name: string
@@ -20,7 +20,7 @@ export interface TelemetryTraceOptions<Schema extends ZodType> {
 
 export interface KnownTelemetryLogEvent<Schema extends ZodType = ZodType> {
   name: KnownTelemetryEventName
-  type: "log"
+  type: 'log'
   version: number
   displayName: string
   description: string
@@ -29,7 +29,7 @@ export interface KnownTelemetryLogEvent<Schema extends ZodType = ZodType> {
 
 export interface KnownTelemetryTrace<Schema extends ZodType = ZodType> {
   name: KnownTelemetryEventName
-  type: "trace"
+  type: 'trace'
   version: number
   displayName: string
   description: string
@@ -49,7 +49,7 @@ export interface TelemetryLogger {
    */
   log<Schema extends ZodType = ZodType>(
     event: KnownTelemetryLogEvent<Schema>,
-    data: z.infer<Schema>
+    data: z.infer<Schema>,
   ): void
   log<Schema extends ZodUndefined>(event: KnownTelemetryLogEvent<Schema>): void
 
@@ -58,12 +58,12 @@ export interface TelemetryLogger {
    * Suitable for use with async/await or Observables
    */
   trace<Schema extends ZodType = ZodType>(
-    event: KnownTelemetryTrace<Schema>
+    event: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema>
 }
 
 export type TelemetryLogEntry = {
-  type: "log"
+  type: 'log'
   event: string // pre-defined event name
   version: number // version of event
   sessionId: string
@@ -72,7 +72,7 @@ export type TelemetryLogEntry = {
 }
 
 export type TelemetryTraceStartEntry = {
-  type: "trace.start"
+  type: 'trace.start'
   event: string // pre-defined event name
   version: number // version of event
   traceId: string
@@ -81,7 +81,7 @@ export type TelemetryTraceStartEntry = {
 }
 
 export type TelemetryTraceLogEntry<T = unknown> = {
-  type: "trace.log"
+  type: 'trace.log'
   event: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string
@@ -90,7 +90,7 @@ export type TelemetryTraceLogEntry<T = unknown> = {
   data: T
 }
 export type TelemetryTraceErrorEntry<T = unknown> = {
-  type: "trace.error"
+  type: 'trace.error'
   event: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string
@@ -99,7 +99,7 @@ export type TelemetryTraceErrorEntry<T = unknown> = {
   data: T
 }
 export type TelemetryTraceCompleteEntry<T = unknown> = {
-  type: "trace.complete"
+  type: 'trace.complete'
   event: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string

@@ -4,18 +4,18 @@ import {
   KnownTelemetryTrace,
   TelemetryLogOptions,
   TelemetryTraceOptions,
-} from "./types.ts"
-import { z, ZodType, ZodUndefined } from "zod"
+} from './types.ts'
+import {z, ZodType, ZodUndefined} from 'zod'
 
 /**
  * @param options
  * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  */
 export function _defineLogEvent<Schema extends ZodType = ZodUndefined>(
-  options: TelemetryLogOptions<Schema>
+  options: TelemetryLogOptions<Schema>,
 ): KnownTelemetryLogEvent<Schema> {
   return {
-    type: "log",
+    type: 'log',
     name: options.name as KnownTelemetryEventName,
     version: options.version,
     displayName: options.displayName,
@@ -28,10 +28,10 @@ export function _defineLogEvent<Schema extends ZodType = ZodUndefined>(
  * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  * */
 export function _defineTraceEvent<Schema extends ZodType = ZodUndefined>(
-  options: TelemetryTraceOptions<Schema>
+  options: TelemetryTraceOptions<Schema>,
 ): KnownTelemetryTrace<Schema> {
   return {
-    type: "trace",
+    type: 'trace',
     name: options.name as KnownTelemetryEventName,
     version: options.version,
     displayName: options.displayName,

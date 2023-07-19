@@ -1,13 +1,50 @@
 {
-  "name": "y",
-  "private": true,
+  "name": "@sanity/telemetry",
   "version": "0.0.0",
+  "description": "Utils for collecting telemetry data from Sanity CLI and Sanity Studio",
+  "keywords": [],
+  "homepage": "https://github.com/sanity-io/telemetry#readme",
+  "bugs": {
+    "url": "https://github.com/sanity-io/telemetry/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sanity-io/telemetry.git"
+  },
+  "license": "MIT",
+  "author": "Bjørge Næss <bjoerge@sanity.io>",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "source": "./src/index.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "dev": "vite examples/studio -c vite.config.ts",
-    "build": "tsc && vite build",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "build": "run-s clean pkg:build pkg:check",
+    "clean": "rimraf dist",
+    "format": "prettier --write --cache --ignore-unknown .",
+    "pkg:build": "pkg build --strict",
+    "pkg:check": "pkg check --strict",
+    "type:check": "tsc --build",
+    "lint": "eslint . --ext .cjs,.js,.ts,.tsx"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write --cache --ignore-unknown"
+    ]
   },
   "dependencies": {
     "lodash": "^4.17.21",
@@ -16,18 +53,29 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@types/node": "^18.16.16",
+    "@sanity/pkg-utils": "^2.3.4",
     "@types/lodash": "^4.14.195",
+    "@types/node": "^18.16.16",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.0",
-    "@typescript-eslint/parser": "^5.59.0",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
     "@vitejs/plugin-react": "^4.0.0",
-    "eslint": "^8.38.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
-    "prettier": "^2.8.8",
-    "typescript": "^5.0.2",
+    "lint-staged": "^13.2.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.0",
+    "prettier-plugin-packagejson": "^2.4.5",
+    "rimraf": "^5.0.1",
+    "typescript": "^5.1.6",
     "vite": "^4.3.9"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -1,13 +1,8 @@
-import { createContext } from "react"
-import {
-  KnownTelemetryLogEvent,
-  KnownTelemetryTrace,
-  TelemetryLogger,
-  TelemetryTrace,
-} from "../types.ts"
-import { createDefaultContext } from "./consoleLogger.ts"
-import { z, ZodType, ZodUndefined } from "zod"
-import { createNoopContext } from "./noopContext.ts"
+import {createContext} from 'react'
+import {KnownTelemetryTrace, TelemetryLogger} from '../types.ts'
+import {createDefaultContext} from './consoleLogger.ts'
+import {z, ZodType} from 'zod'
+import {createNoopContext} from './noopContext.ts'
 
 /**
  * Note that `sessionId` is removed from the signature of these functions
@@ -20,7 +15,7 @@ export interface TelemetryContextValue extends TelemetryLogger {
    */
   tracePromise<Schema extends ZodType>(
     trace: KnownTelemetryTrace<Schema>,
-    promise: Promise<z.infer<Schema>>
+    promise: Promise<z.infer<Schema>>,
   ): Promise<z.infer<Schema>>
 }
 const defaultContext = createDefaultContext()
@@ -28,7 +23,7 @@ const defaultContext = createDefaultContext()
  * @internal
  */
 export const TelemetryContext = createContext<TelemetryContextValue>(
-  createNoopContext()
+  createNoopContext(),
 )
 
 export function TelemetryProvider({

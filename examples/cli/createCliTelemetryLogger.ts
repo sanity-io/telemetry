@@ -1,5 +1,5 @@
-import type { TelemetryEntry, TelemetryLogger } from "@sanity/telemetry"
-import { createBatchedLogger } from "@sanity/telemetry"
+import type {TelemetryEntry, TelemetryLogger} from '@sanity/telemetry'
+import {createBatchedLogger} from '@sanity/telemetry'
 
 interface Options {
   flushInterval?: number
@@ -10,7 +10,7 @@ interface Options {
 interface CLITelemetryLogger extends TelemetryLogger {}
 export function createCliTelemetryLogger(
   sessionId: string,
-  options: Options
+  options: Options,
 ): CLITelemetryLogger {
   const batchedLogger = createBatchedLogger(sessionId, options)
   // we can add convenience methods to the CLI logger here

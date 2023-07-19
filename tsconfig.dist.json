@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.settings",
-  "include": ["./*.cjs", "./*.ts", "./package.config.ts", "./src", "examples"],
+  "include": ["./src"],
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "./dist",
-    "noEmit": true,
+    "emitDeclarationOnly": true,
     "resolveJsonModule": true
   }
 }

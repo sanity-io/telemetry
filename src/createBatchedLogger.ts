@@ -1,5 +1,5 @@
-import { z, ZodType } from "zod"
-import { throttle } from "lodash"
+import {z, ZodType} from 'zod'
+import {throttle} from 'lodash'
 import {
   KnownTelemetryLogEvent,
   KnownTelemetryTrace,
@@ -8,9 +8,9 @@ import {
   TelemetryLogger,
   TelemetryTrace,
   TelemetryTraceEntry,
-} from "./types.ts"
+} from './types.ts'
 
-interface Options {
+export interface CreateBatchedLoggerOptions {
   flushInterval?: number
   // This allows us to switch strategy for resolving consent depending on context (e.g. studio/cli)
   resolveConsent: () => Promise<boolean>
@@ -20,7 +20,7 @@ interface Options {
 
 export function createBatchedLogger(
   sessionId: string,
-  options: Options
+  options: CreateBatchedLoggerOptions,
 ): TelemetryLogger {
   const pending: TelemetryEntry[] = []
 
@@ -29,26 +29,25 @@ export function createBatchedLogger(
       if (pending.length > 0) {
         const batch = pending.slice()
         pending.length = 0
-        console.log("submitting", batch)
         options.submitEntries(batch) // todo: add error handling and recovery
       }
     },
     options.flushInterval ?? 30000,
-    { leading: false, trailing: true }
+    {leading: false, trailing: true},
   )
 
   function pushTraceEntry<Schema extends ZodType>(
-    type: TelemetryTraceEntry["type"],
+    type: TelemetryTraceEntry['type'],
     traceId: string,
-    trace: KnownTelemetryTrace,
-    data?: unknown
+    telemetryTrace: KnownTelemetryTrace,
+    data?: unknown,
   ) {
     pending.push({
       sessionId,
       type,
       traceId,
-      event: trace.name,
-      version: trace.version,
+      event: telemetryTrace.name,
+      version: telemetryTrace.version,
       data,
       createdAt: new Date().toISOString(),
     })
@@ -56,9 +55,9 @@ export function createBatchedLogger(
   }
 
   function pushLogEntry<Schema extends ZodType>(
-    type: TelemetryLogEntry["type"],
+    type: TelemetryLogEntry['type'],
     event: KnownTelemetryLogEvent,
-    data?: unknown
+    data?: unknown,
   ) {
     pending.push({
       sessionId,
@@ -71,30 +70,30 @@ export function createBatchedLogger(
     flush()
   }
   function trace<Schema extends ZodType>(
-    trace: KnownTelemetryTrace<Schema>
+    telemetryTrace: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
     const traceId = Math.random().toString(36).substr(2, 9)
     return {
       start() {
-        pushTraceEntry("trace.start", traceId, trace)
+        pushTraceEntry('trace.start', traceId, telemetryTrace)
       },
       log(data?: unknown) {
-        pushTraceEntry("trace.log", traceId, trace, data)
+        pushTraceEntry('trace.log', traceId, telemetryTrace, data)
       },
       complete() {
-        pushTraceEntry("trace.complete", traceId, trace)
+        pushTraceEntry('trace.complete', traceId, telemetryTrace)
       },
       error(error: Error) {
-        pushTraceEntry("trace.error", traceId, trace)
+        pushTraceEntry('trace.error', traceId, telemetryTrace)
       },
     }
   }
 
   function log<Schema extends ZodType>(
     event: KnownTelemetryLogEvent<Schema>,
-    data?: z.infer<Schema>
+    data?: z.infer<Schema>,
   ) {
-    pushLogEntry("log", event, data)
+    pushLogEntry('log', event, data)
   }
 
   return {
