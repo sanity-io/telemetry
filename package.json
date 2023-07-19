@@ -12,6 +12,9 @@
     "url": "git+ssh://git@github.com/sanity-io/telemetry.git"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "author": "Bjørge Næss <bjoerge@sanity.io>",
   "type": "module",
   "exports": {
