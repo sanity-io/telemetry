@@ -25,6 +25,20 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./events": {
+      "types": "./dist/events/index.d.ts",
+      "source": "./src/events/index.ts",
+      "require": "./dist/events/index.cjs",
+      "import": "./dist/events/index.js",
+      "default": "./dist/events/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "source": "./src/react/index.ts",
+      "require": "./dist/react/index.cjs",
+      "import": "./dist/react/index.js",
+      "default": "./dist/react/index.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.cjs",
