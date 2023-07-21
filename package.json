@@ -1,6 +1,6 @@
 {
   "name": "@sanity/telemetry",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Utils for collecting telemetry data from Sanity CLI and Sanity Studio",
   "keywords": [],
   "homepage": "https://github.com/sanity-io/telemetry#readme",
