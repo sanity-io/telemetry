@@ -24,8 +24,18 @@ export function createBatchedLogger(
 ): TelemetryLogger {
   const pending: TelemetryEntry[] = []
 
+  let fetchConsent: Promise<boolean> | null = null
+
   const flush = throttle(
-    () => {
+    async () => {
+      if (fetchConsent === null) {
+        fetchConsent = options.resolveConsent()
+      }
+      const consented = await fetchConsent
+      if (!consented) {
+        pending.length = 0
+        return
+      }
       if (pending.length > 0) {
         const batch = pending.slice()
         pending.length = 0
