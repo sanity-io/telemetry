@@ -43,6 +43,9 @@ export interface TelemetryTrace<Schema extends ZodType = ZodType> {
   complete(): void
 }
 
+/**
+ * Note that `sessionId` is removed from the signature of these functions
+ */
 export interface TelemetryLogger {
   /*
    * Log a single event, typically a user action, e.g. "Publish"-button clicked

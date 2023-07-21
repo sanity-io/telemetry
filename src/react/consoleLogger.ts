@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
-import {
+import type {
   KnownTelemetryLogEvent,
   KnownTelemetryTrace,
+  TelemetryLogger,
   TelemetryTrace,
 } from '../types.ts'
 import {z, ZodType} from 'zod'
-import {TelemetryContextValue} from './TelemetryProvider.tsx'
 
-export function createDefaultContext(): TelemetryContextValue {
+export function createDefaultContext(): TelemetryLogger {
   function trace<Schema extends ZodType>(
     telemetryTrace: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
@@ -45,28 +45,8 @@ export function createDefaultContext(): TelemetryContextValue {
     console.log(`[telemetry][${event.displayName}@${event.version}] log`, data)
   }
 
-  /** Convenience wrapper for tracing an async execution  */
-  function tracePromise<Schema extends ZodType>(
-    traceEvent: KnownTelemetryTrace<Schema>,
-    promise: Promise<z.infer<Schema>>,
-  ): Promise<z.infer<Schema>> {
-    const tr = trace(traceEvent)
-    tr.start()
-    return promise.then(
-      (result) => {
-        tr.log(result)
-        tr.complete()
-        return result
-      },
-      (error) => {
-        tr.error(error)
-      },
-    )
-  }
-
   return {
     trace,
     log,
-    tracePromise,
   }
 }

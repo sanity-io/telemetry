@@ -1,9 +1,10 @@
 import {z, ZodType} from 'zod'
-import type {TelemetryContextValue} from '@sanity/telemetry/react'
+
 import type {
   KnownTelemetryLogEvent,
   KnownTelemetryTrace,
   TelemetryEntry,
+  TelemetryLogger,
   TelemetryTrace,
 } from '@sanity/telemetry'
 
@@ -18,27 +19,8 @@ interface StudioContextLoggerOptions {
 export function createStudioContextLogger(
   sessionId: string,
   options: StudioContextLoggerOptions,
-): TelemetryContextValue {
+): TelemetryLogger {
   const batchedLogger = createBatchedLogger(sessionId, options)
-
-  /** Convenience wrapper for tracing an async execution  */
-  function tracePromise<Schema extends ZodType>(
-    traceEvent: KnownTelemetryTrace<Schema>,
-    promise: Promise<z.infer<Schema>>,
-  ): Promise<z.infer<Schema>> {
-    const tr = batchedLogger.trace(traceEvent)
-    tr.start()
-    return promise.then(
-      (result) => {
-        tr.log(result)
-        tr.complete()
-        return result
-      },
-      (error) => {
-        tr.error(error)
-      },
-    )
-  }
 
   return {
     log<Schema extends ZodType = ZodType>(
@@ -52,6 +34,5 @@ export function createStudioContextLogger(
     ): TelemetryTrace<Schema> {
       return batchedLogger.trace(event)
     },
-    tracePromise,
   }
 }
