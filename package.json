@@ -66,6 +66,7 @@
     "pkg:build": "pkg build --strict",
     "pkg:check": "pkg check --strict",
     "type:check": "tsc --build",
+    "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .cjs,.js,.ts,.tsx",
     "test": "vitest run",
     "test:watch": "vitest",
