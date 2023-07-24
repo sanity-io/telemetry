@@ -14,7 +14,7 @@ export const exampleEvent = _defineLogEvent({
   version: 1,
   displayName: 'An example event',
   description: 'An example event happened',
-  schema: z.undefined(),
+  schema: z.object({foo: z.literal('bar')}),
 })
 
 export const saveCommentTrace = _defineTraceEvent({

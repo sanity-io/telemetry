@@ -29,7 +29,11 @@ export function createBatchedLogger(
   const flush = throttle(
     async () => {
       if (fetchConsent === null) {
-        fetchConsent = options.resolveConsent()
+        fetchConsent = options.resolveConsent().catch((err) => {
+          // if we for some reason can't fetch consent we treat it as a "no", and try again at next flush
+          fetchConsent = null
+          return false
+        })
       }
       const consented = await fetchConsent
       if (!consented) {

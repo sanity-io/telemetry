@@ -1,24 +1,24 @@
 import {parseArgs} from 'node:util'
 import {cliInitActionEvent, cliStartEvent} from '@sanity/telemetry/events'
-import {TelemetryEntry, TelemetryLogger} from '@sanity/telemetry'
-import {createCliTelemetryLogger} from './createCliTelemetryLogger.ts'
+import type {TelemetryEntry, TelemetryLogger} from '@sanity/telemetry'
+import {createBatchedLogger, createSessionId} from '@sanity/telemetry'
 
 async function resolveConsent() {
   return process.env.TELEMETRY !== 'false'
 }
+
 // todo make proper unique
-const sessionId = Math.random().toString(32).substring(2)
+const sessionId = createSessionId()
 
 function submitEntries(entries: TelemetryEntry[]) {
-  return fetch('https://telemetry.sanity.io/api/v1/log', {
-    method: 'POST',
-    body: JSON.stringify(entries),
-    // …etc
-  })
+  // eslint-disable-next-line no-console
+  console.log('Submit events: ', entries)
+  return Promise.resolve()
 }
 
-const telemetry = createCliTelemetryLogger(sessionId, {
-  resolveConsent: resolveConsent,
+const telemetry = createBatchedLogger(sessionId, {
+  flushInterval: 2000,
+  resolveConsent,
   submitEntries,
 })
 
@@ -50,6 +50,10 @@ function cli(
 }
 
 // Run CLI  with telemetry instance in cli context
+console.log('Running CLI')
 cli(positionals, values, {
   telemetry,
+})
+process.on('exit', () => {
+  console.log('Exiting CLI')
 })

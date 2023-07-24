@@ -16,7 +16,7 @@
     "alwaysStrict": true,
 
     // Additional checks
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
@@ -24,7 +24,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
 
     // Module resolution
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,

@@ -65,13 +65,18 @@
     "format": "prettier --write --cache --ignore-unknown .",
     "pkg:build": "pkg build --strict",
     "pkg:check": "pkg check --strict",
+    "pkg:watch": "pkg watch --strict",
     "type:check": "tsc --build",
     "prepublishOnly": "npm run build",
     "lint": "eslint . --ext .cjs,.js,.ts,.tsx",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "example:studio": "vite --config examples/studio/vite.config.ts examples/studio",
+    "example:cli": "vite-node --config examples/cli/vite.config.ts examples/cli/cli",
+    "examples": "run-p example:*",
+    "dev": "run-p pkg:watch test:watch example:studio"
   },
   "lint-staged": {
     "*": [
@@ -106,6 +111,7 @@
     "rimraf": "^5.0.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.5",
+    "vite-node": "^0.33.0",
     "vitest": "^0.33.0"
   },
   "engines": {
