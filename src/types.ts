@@ -41,6 +41,7 @@ export interface TelemetryTrace<Schema extends ZodType = ZodType> {
   log(data: z.infer<Schema>): void
   error(error: Error): void
   complete(): void
+  wrapPromise<P extends Promise<z.infer<Schema>>>(promise: P): P
 }
 
 /**
@@ -65,55 +66,61 @@ export interface TelemetryLogger {
   ): TelemetryTrace<Schema>
 }
 
-export type TelemetryLogEntry = {
+export type TelemetryLogEvent = {
   type: 'log'
-  event: string // pre-defined event name
+  name: string // pre-defined event name
   version: number // version of event
   sessionId: string
   createdAt: string
   data: unknown
 }
 
-export type TelemetryTraceStartEntry = {
+export type TelemetryTraceStartEvent = {
   type: 'trace.start'
-  event: string // pre-defined event name
+  name: string // pre-defined event name
   version: number // version of event
   traceId: string
   sessionId: string
   createdAt: string
 }
 
-export type TelemetryTraceLogEntry<T = unknown> = {
+export type TelemetryTraceLogEvent<T = unknown> = {
   type: 'trace.log'
-  event: string // pre-defined event name
+  name: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string
   data: T
 }
-export type TelemetryTraceErrorEntry<T = unknown> = {
+export type TelemetryTraceErrorEvent<T = unknown> = {
   type: 'trace.error'
-  event: string // pre-defined event name
+  name: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string
   data: T
 }
-export type TelemetryTraceCompleteEntry<T = unknown> = {
+export type TelemetryTraceCompleteEvent<T = unknown> = {
   type: 'trace.complete'
-  event: string // pre-defined event name
+  name: string // pre-defined event name
   version: number // version of pre-defined event
   traceId: string
   sessionId: string
   createdAt: string
   data: T
 }
-export type TelemetryTraceEntry =
-  | TelemetryTraceStartEntry
-  | TelemetryTraceLogEntry
-  | TelemetryTraceErrorEntry
-  | TelemetryTraceCompleteEntry
+export type TelemetryTraceEvent =
+  | TelemetryTraceStartEvent
+  | TelemetryTraceLogEvent
+  | TelemetryTraceErrorEvent
+  | TelemetryTraceCompleteEvent
 
-export type TelemetryEntry = TelemetryLogEntry | TelemetryTraceEntry
+export type TelemetryEvent = TelemetryLogEvent | TelemetryTraceEvent
+
+export interface TelemetryStore {
+  logger: TelemetryLogger
+  destroy: () => void
+  flush: () => Promise<void>
+}

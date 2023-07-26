@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Studio from './Studio.tsx'
+import Studio from './Studio'
 import './index.css'
-import {StudioTelemetryProvider} from './StudioTelemetryProvider.tsx'
+import {StudioTelemetryProvider} from './StudioTelemetryProvider'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>

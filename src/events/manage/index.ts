@@ -1,4 +1,4 @@
-import {_defineLogEvent} from '../../internal.ts'
+import {_defineLogEvent} from '../../internal'
 
 export const corsOriginAddedEvent = _defineLogEvent({
   name: 'corsOriginAddedEvent',

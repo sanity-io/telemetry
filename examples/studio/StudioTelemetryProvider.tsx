@@ -1,8 +1,8 @@
+import {ReactNode, useEffect, useMemo} from 'react'
+import type {TelemetryEvent} from '@sanity/telemetry'
+import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 import {TelemetryProvider} from '@sanity/telemetry/react'
-import {ReactNode, useMemo} from 'react'
-import {TelemetryEntry} from '../../src/types.ts'
 import {studioSessionStart} from '@sanity/telemetry/events'
-import {createStudioContextLogger} from './createStudioContextLogger.ts'
 
 // Implementation of this could look at env vars, project consent, etc
 async function resolveConsent(): Promise<boolean> {
@@ -11,27 +11,32 @@ async function resolveConsent(): Promise<boolean> {
 
 const STUDIO_VERSION = 'v3.12.0'
 const PLUGIN_VERSIONS = [{pluginName: 'example-plugin', version: 'v2.1.0'}]
-function submitEntries(entries: TelemetryEntry[]) {
-  return fetch('https://telemetry.sanity.io/api/v1/log', {
-    method: 'POST',
-    body: JSON.stringify(entries),
-    // …etc
-  })
+function submitEvents(entries: TelemetryEvent[]) {
+  console.log('Pretend submitting events: ', entries)
+  // return fetch('https://telemetry.sanity.io/api/v1/log', {
+  //   method: 'POST',
+  //   body: JSON.stringify(entries),
+  //   // …etc
+  // })
+  return Promise.resolve()
 }
-const sessionId = Math.random().toString(32).substring(2)
+const sessionId = createSessionId()
 export function StudioTelemetryProvider({children}: {children: ReactNode}) {
   // This is how we could set up telemetry in the studio
-  const logger = useMemo(() => {
-    return createStudioContextLogger(sessionId, {
+  const store = useMemo(() => {
+    return createBatchedStore(sessionId, {
+      flushInterval: 10000,
       resolveConsent,
-      submitEntries: submitEntries,
+      submitEvents,
     })
   }, [])
 
-  logger.log(studioSessionStart, {
-    pluginVersions: PLUGIN_VERSIONS,
-    studioVersion: STUDIO_VERSION,
-  })
+  useEffect(() => {
+    store.logger.log(studioSessionStart, {
+      pluginVersions: PLUGIN_VERSIONS,
+      studioVersion: STUDIO_VERSION,
+    })
+  }, [store])
 
-  return <TelemetryProvider logger={logger}>{children}</TelemetryProvider>
+  return <TelemetryProvider logger={store.logger}>{children}</TelemetryProvider>
 }

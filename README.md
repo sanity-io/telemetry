@@ -2,10 +2,10 @@
 
 Utils for collecting telemetry data from Sanity CLI and Sanity Studio
 
-# Configure logger for the environment/runtime:
+# Configure telemetry store for the environment/runtime:
 
 ```typescript
-import {createBatchedLogger, createSessionId} from '@sanity/telemetry'
+import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 
 const sessionId = createSessionId()
 
@@ -43,3 +43,16 @@ Note: a trace may or may not complete. Trace events are submitted continuously a
 
 A trace i logger.log(exampleEvent, {foo: "bar"})
 ```
+
+Node/CLI:
+```typescript
+const stopCollecting = store.start()
+
+process.on('exit', () => {
+  store.flush()
+  stopCollecting()
+})
+
+```
+TODO:
+Start listening for events

@@ -1,5 +1,5 @@
 import {z} from 'zod'
-import {_defineLogEvent, _defineTraceEvent} from '../../internal.ts'
+import {_defineLogEvent, _defineTraceEvent} from '../../internal'
 
 export const publishDocumentEvent = _defineLogEvent({
   name: 'publishDocumentEvent',
@@ -20,6 +20,7 @@ export const uploadImageTrace = _defineTraceEvent({
   version: 1,
   displayName: 'Uploading image',
   description: 'User uploaded an image to the studio',
+  // define schema for the events that can be logged to the trace
   schema: z.object({imageSize: z.number()}),
 })
 

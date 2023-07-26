@@ -1,38 +1,14 @@
 import {useState} from 'react'
 import {
   incrementButtonClickEvent,
-  KnownTelemetryTrace,
   saveCommentTrace,
-  TelemetryLogger,
 } from '@sanity/telemetry/events'
 import {useTelemetry} from '@sanity/telemetry/react'
-import {z, ZodType} from 'zod'
-
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const postComment = async (comment: string) => {
   return delay(Math.random() * 3000).then(() =>
     Math.random() > 0.5 ? {ok: true} : Promise.reject(new Error('HTTP Error')),
-  )
-}
-
-/** Convenience wrapper for tracing an async execution  */
-function withTrace<Schema extends ZodType>(
-  logger: TelemetryLogger,
-  traceEvent: KnownTelemetryTrace<Schema>,
-  promise: Promise<z.infer<Schema>>,
-): Promise<z.infer<Schema>> {
-  const tr = logger.trace(traceEvent)
-  tr.start()
-  return promise.then(
-    (result) => {
-      tr.log(result)
-      tr.complete()
-      return result
-    },
-    (error) => {
-      tr.error(error)
-    },
   )
 }
 function Studio() {
@@ -46,11 +22,9 @@ function Studio() {
     logger.log(incrementButtonClickEvent, {count: count + 1})
   }
   const handlePostComment = async () => {
-    const result = await withTrace(
-      logger,
-      saveCommentTrace,
-      postComment('some comment'),
-    )
+    const result = await logger
+      .trace(saveCommentTrace)
+      .wrapPromise(postComment('some comment'))
 
     console.log('Comment "saved"!', result)
   }

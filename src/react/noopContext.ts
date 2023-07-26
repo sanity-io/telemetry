@@ -3,10 +3,10 @@ import type {
   KnownTelemetryTrace,
   TelemetryLogger,
   TelemetryTrace,
-} from '../types.ts'
-import {z, ZodType} from 'zod'
+} from '../types'
+import {TypeOf, z, ZodType} from 'zod'
 
-export function createNoopContext(): TelemetryLogger {
+export function createNoopLogger(): TelemetryLogger {
   function trace<Schema extends ZodType>(
     telemetryTrace: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
@@ -15,6 +15,7 @@ export function createNoopContext(): TelemetryLogger {
       log(data?: unknown) {},
       complete() {},
       error(error: Error) {},
+      wrapPromise: (promise) => promise,
     }
   }
   function log<Schema extends ZodType>(

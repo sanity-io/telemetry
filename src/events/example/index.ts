@@ -1,5 +1,5 @@
 import {z} from 'zod'
-import {_defineLogEvent, _defineTraceEvent} from '../../internal.ts'
+import {_defineLogEvent, _defineTraceEvent} from '../../internal'
 
 export const incrementButtonClickEvent = _defineLogEvent({
   name: 'incrementButtonClickEvent',

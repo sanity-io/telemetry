@@ -1,4 +1,4 @@
-import {_defineLogEvent} from '../../internal.ts'
+import {_defineLogEvent} from '../../internal'
 import {z} from 'zod'
 
 export const cliStartEvent = _defineLogEvent({
@@ -9,8 +9,15 @@ export const cliStartEvent = _defineLogEvent({
   schema: z.object({nodeVersion: z.string()}),
 })
 
-export const cliInitActionEvent = _defineLogEvent({
+export const cliInitActionStart = _defineLogEvent({
   name: 'cliInitEvent',
+  version: 1,
+  displayName: 'sanity init',
+  description: 'User ran sanity init',
+})
+
+export const cliInitActionComplete = _defineLogEvent({
+  name: 'cliActionCompletedEvent',
   version: 1,
   displayName: 'sanity init',
   description: 'User ran sanity init',

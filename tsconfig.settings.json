@@ -27,15 +27,9 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@sanity/telemetry": ["./src"],
-      "@sanity/telemetry/react": ["./src/react"],
-      "@sanity/telemetry/events": ["./src/events"]
-    }
-  },
-  "references": [{"path": "./tsconfig.node.json"}]
+    "jsx": "react-jsx"
+  }
 }

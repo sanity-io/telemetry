@@ -4,7 +4,7 @@ import {
   KnownTelemetryTrace,
   TelemetryLogOptions,
   TelemetryTraceOptions,
-} from './types.ts'
+} from './types'
 import {z, ZodType, ZodUndefined} from 'zod'
 
 /**

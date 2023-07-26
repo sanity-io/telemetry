@@ -74,7 +74,7 @@
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
     "example:studio": "vite --config examples/studio/vite.config.ts examples/studio",
-    "example:cli": "vite-node --config examples/cli/vite.config.ts examples/cli/cli",
+    "example:cli": "vite-node --config examples/cli/vite.config.ts examples/cli/cli -- init",
     "examples": "run-p example:*",
     "dev": "run-p pkg:watch test:watch example:studio"
   },
@@ -87,6 +87,8 @@
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "rxjs": "^7.8.1",
+    "typeid-ts": "^0.2.8",
     "zod": "^3.21.4"
   },
   "devDependencies": {

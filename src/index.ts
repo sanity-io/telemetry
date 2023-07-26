@@ -1,3 +1,3 @@
-export * from './createSessionId.ts'
-export * from './createBatchedLogger.ts'
-export * from './types.ts'
+export * from './createSessionId'
+export * from './createBatchedStore'
+export * from './types'
