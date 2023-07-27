@@ -41,7 +41,8 @@ export interface TelemetryTrace<Schema extends ZodType = ZodType> {
   log(data: z.infer<Schema>): void
   error(error: Error): void
   complete(): void
-  wrapPromise<P extends Promise<z.infer<Schema>>>(promise: P): P
+  await<P extends Promise<unknown>>(promise: P, data: z.infer<Schema>): P
+  await<P extends Promise<unknown>>(promise: P): P
 }
 
 /**
@@ -55,6 +56,7 @@ export interface TelemetryLogger {
     event: KnownTelemetryLogEvent<Schema>,
     data: z.infer<Schema>,
   ): void
+
   log<Schema extends ZodUndefined>(event: KnownTelemetryLogEvent<Schema>): void
 
   /*

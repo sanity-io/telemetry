@@ -15,9 +15,10 @@ export function createNoopLogger(): TelemetryLogger {
       log(data?: unknown) {},
       complete() {},
       error(error: Error) {},
-      wrapPromise: (promise) => promise,
+      await: (promise) => promise,
     }
   }
+
   function log<Schema extends ZodType>(
     event: KnownTelemetryLogEvent<Schema>,
     data?: z.infer<Schema>,

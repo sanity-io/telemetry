@@ -1,7 +1,7 @@
 import {_defineLogEvent} from '../../internal'
 
-export const corsOriginAddedEvent = _defineLogEvent({
-  name: 'corsOriginAddedEvent',
+export const CorsOriginAdded = _defineLogEvent({
+  name: 'CorsOriginAdded',
   displayName: 'Cors origin added',
   description: 'Cors origin added to project',
   version: 1,

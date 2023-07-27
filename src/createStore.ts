@@ -54,28 +54,35 @@ export function createStore(sessionId: SessionId): {
       createdAt: new Date().toISOString(),
     })
   }
+
   function trace<Schema extends ZodType>(
-    telemetryTrace: KnownTelemetryTrace<Schema>,
+    traceDef: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
     const traceId = typeid('trace')
     return {
       start() {
-        pushTraceEntry('trace.start', traceId, telemetryTrace)
+        pushTraceEntry('trace.start', traceId, traceDef)
       },
       log(data?: unknown) {
-        pushTraceEntry('trace.log', traceId, telemetryTrace, data)
+        const result = traceDef.schema.safeParse(data)
+        if (result.success) {
+          pushTraceEntry('trace.log', traceId, traceDef, result.data)
+        } else {
+          // ignore
+        }
       },
       complete() {
-        pushTraceEntry('trace.complete', traceId, telemetryTrace)
+        pushTraceEntry('trace.complete', traceId, traceDef)
       },
       error(error: Error) {
-        pushTraceEntry('trace.error', traceId, telemetryTrace, error)
+        pushTraceEntry('trace.error', traceId, traceDef, error)
       },
-      wrapPromise<P extends Promise<z.infer<Schema>>>(promise: P): P {
+      await<P extends Promise<unknown>>(promise: P, data?: z.infer<Schema>): P {
+        const dataPassed = arguments.length > 1
         this.start()
-        return promise.then(
+        promise.then(
           (result) => {
-            this.log(result)
+            this.log(dataPassed ? data : result)
             this.complete()
             return result
           },
@@ -83,7 +90,8 @@ export function createStore(sessionId: SessionId): {
             this.error(error)
             throw error
           },
-        ) as P
+        )
+        return promise
       },
     }
   }
@@ -92,7 +100,10 @@ export function createStore(sessionId: SessionId): {
     event: KnownTelemetryLogEvent<Schema>,
     data?: z.infer<Schema>,
   ) {
-    pushLogEntry('log', event, data)
+    const result = event.schema.safeParse(data)
+    if (result.success) {
+      pushLogEntry('log', event, data)
+    }
   }
 
   return {

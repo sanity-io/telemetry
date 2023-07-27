@@ -1,9 +1,5 @@
 import {parseArgs} from 'node:util'
-import {
-  cliInitActionComplete,
-  cliInitActionStart,
-  cliStartEvent,
-} from '../../src/events'
+import {ExampleCliAction, ExampleCliStart} from '../../src/events'
 import type {TelemetryEvent, TelemetryLogger} from '@sanity/telemetry'
 import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 import {promises as readline} from 'node:readline'
@@ -41,20 +37,24 @@ const {values, positionals} = parseArgs({
   },
 })
 
+async function runInit() {
+  const rl = readline.createInterface({input, output})
+  await rl.question('Press enter to exit\n\n')
+  rl.close()
+}
+
 // imaginary cli entry point
 async function cli(
   args: string[],
   flags: Record<string, string | boolean | undefined>,
   ctx: {telemetry: TelemetryLogger},
 ) {
-  ctx.telemetry.log(cliStartEvent, {nodeVersion: process.version})
-  ctx.telemetry.log(cliInitActionStart)
+  ctx.telemetry.log(ExampleCliStart, {nodeVersion: process.version})
+
+  const trace = ctx.telemetry.trace(ExampleCliAction)
   if (args[0] === 'init') {
-    const rl = readline.createInterface({input, output})
-    await rl.question('Press enter to exit\n\n')
-    rl.close()
+    await trace.await(runInit(), {actionName: args[0]})
   }
-  ctx.telemetry.log(cliInitActionComplete)
 }
 
 process.on('beforeExit', async () => {

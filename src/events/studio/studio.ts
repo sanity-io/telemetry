@@ -1,34 +1,25 @@
 import {z} from 'zod'
 import {_defineLogEvent, _defineTraceEvent} from '../../internal'
 
-export const publishDocumentEvent = _defineLogEvent({
-  name: 'publishDocumentEvent',
+export const PublishDocument = _defineLogEvent({
+  name: 'PublishDocument',
   version: 1,
   displayName: 'Publish document',
   description: 'User clicked the "Publish" button in the document pane',
 })
 
-export const reviewChangesOpenedEvent = _defineLogEvent({
-  name: 'reviewChangesOpened',
+export const ReviewChangesOpened = _defineLogEvent({
+  name: 'ReviewChangesOpened',
   version: 1,
   displayName: 'Review changes opened',
   description: 'User opened review changes',
 })
 
-export const uploadImageTrace = _defineTraceEvent({
-  name: 'uploadImageTrace',
+export const StudioMount = _defineLogEvent({
+  name: 'StudioMount',
   version: 1,
-  displayName: 'Uploading image',
-  description: 'User uploaded an image to the studio',
-  // define schema for the events that can be logged to the trace
-  schema: z.object({imageSize: z.number()}),
-})
-
-export const studioSessionStart = _defineLogEvent({
-  name: 'studioSessionStart',
-  version: 1,
-  displayName: 'Studio opened',
-  description: 'Studio opened by user',
+  displayName: 'Studio mount',
+  description: 'The Studio was mounted on the page',
   schema: z.object({
     studioVersion: z.string(),
     pluginVersions: z.array(

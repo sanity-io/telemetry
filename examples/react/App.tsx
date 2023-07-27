@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import {
-  incrementButtonClickEvent,
-  saveCommentTrace,
+  ExampleIncrementButtonClick,
+  ExampleSaveComment,
 } from '@sanity/telemetry/events'
 import {useTelemetry} from '@sanity/telemetry/react'
 
@@ -21,13 +21,14 @@ function App() {
 
   const handleButtonClick = () => {
     setCount((nextCount) => nextCount + 1)
-    logger.log(incrementButtonClickEvent, {count: count + 1})
+    logger.log(ExampleIncrementButtonClick, {count: count + 1})
   }
   const handlePostComment = async () => {
     const result = await logger
-      .trace(saveCommentTrace)
-      .wrapPromise(postComment('some comment'))
+      .trace(ExampleSaveComment)
+      .await(postComment('some comment'))
 
+    // eslint-disable-next-line no-console
     console.log('Comment "saved"!', result)
   }
   return (
