@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import Studio from './Studio'
+import App from './App'
 import './index.css'
-import {StudioTelemetryProvider} from './StudioTelemetryProvider'
+import {Root} from './Root'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <StudioTelemetryProvider>
-      <Studio />
-    </StudioTelemetryProvider>
+    <Root>
+      <App />
+    </Root>
   </React.StrictMode>,
 )

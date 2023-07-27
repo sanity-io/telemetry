@@ -1,7 +1,7 @@
 import {useContext} from 'react'
-import {TelemetryContext} from './TelemetryProvider'
+import {TelemetryLoggerContext} from './TelemetryProvider'
 import type {TelemetryLogger} from '../'
 
 export function useTelemetry(): TelemetryLogger {
-  return useContext(TelemetryContext)
+  return useContext(TelemetryLoggerContext)
 }

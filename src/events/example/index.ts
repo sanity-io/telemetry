@@ -9,6 +9,14 @@ export const incrementButtonClickEvent = _defineLogEvent({
   schema: z.object({count: z.number()}),
 })
 
+export const exampleTrace = _defineTraceEvent({
+  name: 'exampleTrace',
+  version: 1,
+  displayName: 'Example Trace',
+  description: 'An example trace for demo purposes',
+  schema: z.object({step: z.string()}),
+})
+
 export const exampleEvent = _defineLogEvent({
   name: 'exampleEvent',
   version: 1,

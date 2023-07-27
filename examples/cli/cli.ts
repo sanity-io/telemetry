@@ -24,7 +24,7 @@ function submitEvents(entries: TelemetryEvent[]) {
 const telemetryStore = createBatchedStore(sessionId, {
   flushInterval: 2000,
   resolveConsent,
-  submitEvents,
+  sendEvents: submitEvents,
 })
 
 const {values, positionals} = parseArgs({
@@ -58,9 +58,7 @@ async function cli(
 }
 
 process.on('beforeExit', async () => {
-  console.log('[debug] Flushing telemetry store before exiting')
   await telemetryStore.flush()
-  console.log('[debug] Flushed telemetry store')
 })
 
 // Run CLI  with telemetry instance in cli context

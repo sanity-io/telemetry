@@ -1,25 +1,29 @@
 import type React from 'react'
 import {createContext} from 'react'
-import {TelemetryLogger} from '../types'
+import {TelemetryLogger, TelemetryStore} from '../types'
 import {createNoopLogger} from './noopContext'
+import {useTelemetryStoreLifeCycleEvents} from './useTelemetryStoreLifeCycleEvents'
 
 /**
  * @internal
  */
-export const TelemetryContext = createContext<TelemetryLogger>(
+export const TelemetryLoggerContext = createContext<TelemetryLogger>(
   createNoopLogger(),
 )
 
 export function TelemetryProvider({
   children,
-  logger,
+  store,
 }: {
   children: React.ReactNode
-  logger: TelemetryLogger
+  store: TelemetryStore
 }) {
+  // Hook the telemetry store up to page life cycle events like hide/unload
+  useTelemetryStoreLifeCycleEvents(store)
+
   return (
-    <TelemetryContext.Provider value={logger}>
+    <TelemetryLoggerContext.Provider value={store.logger}>
       {children}
-    </TelemetryContext.Provider>
+    </TelemetryLoggerContext.Provider>
   )
 }

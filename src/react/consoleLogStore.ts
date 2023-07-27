@@ -14,12 +14,14 @@ function formatLogEvent(event: TelemetryLogEvent) {
     event.data,
   ]
 }
+
 function formatTraceEvent(trace: TelemetryTraceEvent) {
   return [
     `[telemetry][${trace.name}@${trace.version}][${trace.type}]}`,
     ...(trace.type === 'trace.log' ? [trace.data] : []),
   ]
 }
+
 function formatEvent(event: TelemetryEvent) {
   return event.type == 'log' ? formatLogEvent(event) : formatTraceEvent(event)
 }
@@ -34,12 +36,15 @@ export function createConsoleLogStore(sessionId: SessionId): TelemetryStore {
   const subscription = store.events$.subscribe(log)
   return {
     logger: store.logger,
-    destroy: () => {
+    end: () => {
       subscription.unsubscribe()
     },
     flush: () => {
       /* noop as all events are logged to the console immediately */
       return Promise.resolve()
+    },
+    endWithBeacon: () => {
+      return true
     },
   }
 }

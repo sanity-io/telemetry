@@ -121,6 +121,7 @@ export type TelemetryEvent = TelemetryLogEvent | TelemetryTraceEvent
 
 export interface TelemetryStore {
   logger: TelemetryLogger
-  destroy: () => void
+  end: () => void
+  endWithBeacon: () => boolean
   flush: () => Promise<void>
 }

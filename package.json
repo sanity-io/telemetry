@@ -73,7 +73,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
-    "example:studio": "vite --config examples/studio/vite.config.ts examples/studio",
+    "example:studio": "vite --config examples/react/vite.config.ts examples/react",
     "example:cli": "vite-node --config examples/cli/vite.config.ts examples/cli/cli -- init",
     "examples": "run-p example:*",
     "dev": "run-p pkg:watch test:watch example:studio"

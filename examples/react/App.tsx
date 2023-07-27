@@ -4,6 +4,7 @@ import {
   saveCommentTrace,
 } from '@sanity/telemetry/events'
 import {useTelemetry} from '@sanity/telemetry/react'
+
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const postComment = async (comment: string) => {
@@ -11,7 +12,8 @@ const postComment = async (comment: string) => {
     Math.random() > 0.5 ? {ok: true} : Promise.reject(new Error('HTTP Error')),
   )
 }
-function Studio() {
+
+function App() {
   const [count, setCount] = useState(0)
 
   // We only interact with the api and don't care how it's set up
@@ -44,4 +46,4 @@ function Studio() {
   )
 }
 
-export default Studio
+export default App

@@ -15,11 +15,27 @@ import {SessionId} from './createSessionId'
 import {createStore} from './createStore'
 
 export interface CreateBatchedStoreOptions {
+  /**
+   * Optionally provide a flush interval
+   */
   flushInterval?: number
-  // This allows us to switch strategy for resolving consent depending on context (e.g. studio/cli)
+
+  /**
+   *  Provide a strategy for resolving consent depending on context (e.g. studio/cli)
+   *  @public
+   */
   resolveConsent: () => Promise<boolean>
-  // This allows us to switch strategy for submitting log entries (e.g. using fetch in browser, or node server side)
-  submitEvents: (events: TelemetryEvent[]) => Promise<unknown>
+  /**
+   * Provide a strategy for submitting events (e.g. using fetch in browser, or node server side)
+   * @public
+   */
+  sendEvents: (events: TelemetryEvent[]) => Promise<unknown>
+
+  /**
+   * Optionally provide a strategy for submitting final events (e.g. events that's queued when the browser exits)
+   * @public
+   */
+  sendBeacon?: (events: TelemetryEvent[]) => boolean
 }
 
 export function createBatchedStore(
@@ -50,10 +66,11 @@ export function createBatchedStore(
   }
 
   function submit(events: TelemetryEvent[]) {
+    if (events.length === 0) {
+      return EMPTY
+    }
     return from(fetchConsent()).pipe(
-      mergeMap((consented) =>
-        consented ? options.submitEvents(events) : EMPTY,
-      ),
+      mergeMap((consented) => (consented ? options.sendEvents(events) : EMPTY)),
     )
   }
 
@@ -62,9 +79,8 @@ export function createBatchedStore(
   const flush$ = store.events$.pipe(
     tap((ev) => _buffer.push(ev)),
     map(() => {}), // void to avoid accidental use of events further down the pipe
-    throttleTime(flushInterval, undefined, {trailing: true}),
+    throttleTime(flushInterval, undefined, {leading: false, trailing: true}),
     map(() => consume()),
-    filter((pending) => pending.length > 0),
     concatMap((pending) =>
       submit(pending).pipe(
         catchError((err) => {
@@ -78,24 +94,41 @@ export function createBatchedStore(
   )
 
   function flush() {
-    return lastValueFrom(submit(consume())).then(() => {})
+    return lastValueFrom(submit(consume()), {
+      defaultValue: undefined,
+    }).then(() => {})
   }
 
   // start subscribing to events
   const subscription = flush$.subscribe()
 
+  function endWithBeacon() {
+    if (!options.sendBeacon) {
+      // we don't have a beacon strategy, so we just flush - this may make us lose events, but it's the best we can do
+      end()
+      return true
+    }
+    const events = consume()
+    subscription.unsubscribe()
+    return events.length > 0 ? options.sendBeacon(events) : true
+  }
+
+  function end() {
+    // flush before destroying
+    return flush()
+      .then(
+        () => {}, // void promise
+        () => {}, // ignore errors
+      )
+      .finally(() => {
+        // Note: we might end up with an error here
+        subscription.unsubscribe()
+      })
+  }
+
   return {
-    destroy: () => {
-      // flush before destroying
-      return lastValueFrom(submit(consume()))
-        .then(
-          () => {}, // void promise
-          () => {}, // ignore errors
-        )
-        .finally(() => {
-          subscription.unsubscribe()
-        })
-    },
+    end,
+    endWithBeacon,
     // Note: flush may fail
     flush,
     logger: store.logger,
