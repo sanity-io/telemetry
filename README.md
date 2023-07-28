@@ -48,7 +48,7 @@ const sessionId = createSessionId()
 const store = createBatchedStore(sessionId, {
 
   // submit any pending events every 30s
-  flushInterval: 30000,
+  flushInterval: 10000,
 
   // implement user consent resolving
   resolveConsent: () => {
@@ -58,7 +58,7 @@ const store = createBatchedStore(sessionId, {
   // implement sending events to backend
   sendEvents: (events) => {
     //…
-  }
+  },
 
   // opt into a different strategy for sending events when the browser close, reload or navigate away from the current page (recommended)
   sendBeacon: (events) => {
@@ -67,12 +67,8 @@ const store = createBatchedStore(sessionId, {
 })
 
 // Wrap the app in a TelemetryProvider
-// This will enable usage of the `useTelemetry()` hook
+// This will enable usage of the `useTelemetry()` hook for descendants
 function Root() {
-
-  // Hook the telemetry store up to page life cycle events like hide/unload
-  useTelemetryStoreLifeCycleEvents(store)
-
   return (
     <TelemetryProvider store={store}>
       <App />
@@ -80,7 +76,21 @@ function Root() {
   )
 }
 
+// Usage in a component
+function App() {
+  const telemetry = useTelemetry()
+  const handleClick = useCallback(() => {
+    // Call the `log` method to log a one-off event
+    telemetry.log(ExampleEvent, {foo: 'bar'})
+  }, [])
+
+  return (
+    //…
+    <button onClick={handleClick}>Click me</button>
+  )
+}
 ```
+
 
 ### Node.js/CLI
 
@@ -107,9 +117,12 @@ const store = createBatchedStore(sessionId, {
 
 // Make sure to send collected events before exiting the application
 process.on('beforeExit', async () => telemetryStore.end())
+
+// Start logging events
+store.logger.log(ExampleEvent, {foo: 'bar'})
 ```
 
-Once the logger has been configured, application code can start by calling either the `.log()` or `.trace()` method
+The store returns a `logger` object, that application code can use for logging telemetry events or traces by calling the `.log()` or `.trace()` methods
 defined on it.
 
 ### Track a one-off event
@@ -154,7 +167,7 @@ try {
 
 ### Trace promise helper
 
-As an alternative, you can also use the `wrapPromise` helper to automatically mark the trace as completed or failed when
+As an alternative, you can also use the `await` helper to automatically mark the trace as completed or failed when
 the promise resolves or rejects:
 
 ```typescript
@@ -162,8 +175,11 @@ async function performSomeAction() {
   //…
 }
 const trace = logger.trace(exampleTrace)
-const res = trace.wrapPromise(performSomeAction())
+const res = trace.await(performSomeAction())
 ```
 
-This will return the same promise as `performSomeAction()`, but the trace will be marked as completed or failed when the
-promise resolves or rejects
+This will return the same promise as `performSomeAction()`, but the trace will be marked as completed or failed when the promise resolves or rejects. It will log the value the promise resolves to, or the error it rejects with. To specify a custom value to log, pass it as the second argument:
+
+```typescript
+trace.await(performSomeAction(), {foo: 'this will be logged when the action completes'})
+```
