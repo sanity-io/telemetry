@@ -1,4 +1,4 @@
-import {typeid} from 'typeid-ts'
+import {typeid} from 'typeid-js'
 
 /**
  * @public
@@ -6,5 +6,5 @@ import {typeid} from 'typeid-ts'
 export type SessionId = string & {__type: 'SessionId'}
 
 export function createSessionId(): SessionId {
-  return typeid('session') as SessionId
+  return typeid('session').toString() as SessionId
 }

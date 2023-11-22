@@ -9,8 +9,9 @@ import {
   TelemetryTraceEvent,
 } from './types'
 import {Observable, Subject} from 'rxjs'
-import {typeid} from 'typeid-ts'
+import {typeid} from 'typeid-js'
 import {SessionId} from './createSessionId'
+import {createTraceId} from './createTraceId'
 
 /**
  * Bare-bones store for logging and reacting to telemetry events
@@ -58,7 +59,7 @@ export function createStore(sessionId: SessionId): {
   function trace<Schema extends ZodType>(
     traceDef: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
-    const traceId = typeid('trace')
+    const traceId = createTraceId()
     return {
       start() {
         pushTraceEntry('trace.start', traceId, traceDef)

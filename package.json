@@ -88,7 +88,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rxjs": "^7.8.1",
-    "typeid-ts": "^0.3.8",
+    "typeid-js": "^0.3.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {
