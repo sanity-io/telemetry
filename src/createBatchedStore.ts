@@ -8,11 +8,23 @@ import {
   lastValueFrom,
   map,
   mergeMap,
+  Observable,
   tap,
+  throttle,
   throttleTime,
 } from 'rxjs'
 import {SessionId} from './createSessionId'
 import {createStore} from './createStore'
+
+const unrefTimer = (ms: number) =>
+  new Observable((subscriber) => {
+    const timeout = setTimeout(() => subscriber.next(), ms)
+    if (typeof timeout.unref === 'function') {
+      // unref the timeout to avoid holding the process open in node.js
+      timeout.unref()
+    }
+    return () => clearTimeout(timeout)
+  })
 
 export interface CreateBatchedStoreOptions {
   /**
@@ -79,7 +91,10 @@ export function createBatchedStore(
   const flush$ = store.events$.pipe(
     tap((ev) => _buffer.push(ev)),
     map(() => {}), // void to avoid accidental use of events further down the pipe
-    throttleTime(flushInterval, undefined, {leading: false, trailing: true}),
+    throttle(() => unrefTimer(flushInterval), {
+      leading: false,
+      trailing: true,
+    }),
     map(() => consume()),
     concatMap((pending) =>
       submit(pending).pipe(
