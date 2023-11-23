@@ -6,7 +6,7 @@ export const CliStart = _defineLogEvent({
   version: 1,
   displayName: 'sanity cli started',
   description: 'User ran the sanity cli',
-  schema: z.object({nodeVersion: z.string()}),
+  schema: z.object({nodeVersion: z.string(), cliVersion: z.string()}),
 })
 
 export const CliActionStart = _defineLogEvent({
