@@ -1,5 +1,5 @@
-import {_defineLogEvent} from '../../internal'
-import {z} from 'zod'
+import {_defineLogEvent, _defineTraceEvent} from '../../internal'
+import {discriminatedUnion, union, z} from 'zod'
 
 export const CliStart = _defineLogEvent({
   name: 'cliStartEvent',
@@ -9,10 +9,16 @@ export const CliStart = _defineLogEvent({
   schema: z.object({nodeVersion: z.string(), cliVersion: z.string()}),
 })
 
-export const CliActionStart = _defineLogEvent({
-  name: 'CliActionStart',
+const commonCommandProps = z.object({duration: z.number()})
+
+const nullCommand = z.object({commandName: z.null()})
+const startCommand = z.object({commandName: z.literal('start')})
+const commands = discriminatedUnion('commandName', [nullCommand, startCommand])
+
+export const CliCommand = _defineTraceEvent({
+  name: 'cliCommand',
   version: 1,
-  displayName: 'Cli action started',
+  displayName: 'CLI action',
   description: 'User ran a cli action',
-  schema: z.object({name: z.string()}),
+  schema: z.object({commandName: z.string()}),
 })
