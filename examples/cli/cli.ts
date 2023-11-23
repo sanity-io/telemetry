@@ -6,7 +6,9 @@ import {promises as readline} from 'node:readline'
 import {stdin as input, stdout as output} from 'node:process'
 
 async function resolveConsent() {
-  return process.env.TELEMETRY !== 'false'
+  return {
+    status: process.env.TELEMETRY === 'false' ? 'denied' : 'granted',
+  } as const
 }
 
 const sessionId = createSessionId()

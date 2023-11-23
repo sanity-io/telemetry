@@ -5,8 +5,8 @@ import {TelemetryProvider} from '@sanity/telemetry/react'
 import {StudioMount} from '@sanity/telemetry/events'
 
 // Implementation of this could look at env vars, project consent, etc
-async function resolveConsent(): Promise<boolean> {
-  return true
+async function resolveConsent() {
+  return {status: 'granted'} as const
 }
 
 function sendBeacon(url: string, payload: TelemetryEvent[]) {

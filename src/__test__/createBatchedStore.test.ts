@@ -7,7 +7,7 @@ test('Logging an example event', async () => {
   const sendEvents = vi.fn().mockResolvedValue(undefined)
   const {logger} = createBatchedStore(createSessionId(), {
     flushInterval: 100,
-    resolveConsent: () => Promise.resolve(true),
+    resolveConsent: () => Promise.resolve({status: 'granted'}),
     sendEvents,
   })
 
@@ -31,7 +31,7 @@ test('Tracing an async operation that resolves to an invalid value', async () =>
   const sendEvents = vi.fn().mockResolvedValue(undefined)
   const {logger} = createBatchedStore(createSessionId(), {
     flushInterval: 100,
-    resolveConsent: () => Promise.resolve(true),
+    resolveConsent: () => Promise.resolve({status: 'granted'}),
     sendEvents,
   })
 
