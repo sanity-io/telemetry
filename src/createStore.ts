@@ -9,7 +9,6 @@ import {
   TelemetryTraceEvent,
 } from './types'
 import {Observable, Subject} from 'rxjs'
-import {typeid} from 'typeid-js'
 import {SessionId} from './createSessionId'
 import {createTraceId} from './createTraceId'
 
