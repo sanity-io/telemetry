@@ -1,6 +1,6 @@
 import type {
-  KnownTelemetryLogEvent,
-  KnownTelemetryTrace,
+  DefinedTelemetryLog,
+  DefinedTelemetryTrace,
   TelemetryLogger,
   TelemetryTrace,
 } from '../types'
@@ -11,9 +11,9 @@ export function createNoopLogger(): TelemetryLogger {
     trace,
     log,
   }
-  function trace<Schema extends ZodType>(
-    telemetryTrace: KnownTelemetryTrace<Schema>,
-  ): TelemetryTrace<Schema> {
+  function trace<Data>(
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+  ): TelemetryTrace<Data> {
     return {
       start() {},
       log(data?: unknown) {},
@@ -22,12 +22,12 @@ export function createNoopLogger(): TelemetryLogger {
         return logger
       },
       error(error: Error) {},
-      await: (promise) => promise,
+      await: (promise: Promise<Data>) => promise,
     }
   }
 
   function log<Schema extends ZodType>(
-    event: KnownTelemetryLogEvent<Schema>,
+    event: DefinedTelemetryLog<Schema>,
     data?: z.infer<Schema>,
   ) {}
 

@@ -1,7 +1,6 @@
-import {z, ZodType} from 'zod'
 import {
-  KnownTelemetryLogEvent,
-  KnownTelemetryTrace,
+  DefinedTelemetryLog,
+  DefinedTelemetryTrace,
   TelemetryEvent,
   TelemetryLogEvent,
   TelemetryLogger,
@@ -23,11 +22,33 @@ export function createStore(sessionId: SessionId): {
 } {
   const logEntries$ = new Subject<TelemetryEvent>()
 
-  function pushTraceEntry<Schema extends ZodType>(
+  function pushTraceEntry<Data, Err extends {message: string}>(
+    type: 'trace.error',
+    traceId: string,
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+    error: {message: string},
+  ): void
+  function pushTraceEntry<Data>(
+    type: 'trace.start',
+    traceId: string,
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+  ): void
+  function pushTraceEntry<Data>(
+    type: 'trace.log',
+    traceId: string,
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+    data: Data,
+  ): void
+  function pushTraceEntry<Data>(
+    type: 'trace.complete',
+    traceId: string,
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+  ): void
+  function pushTraceEntry<Data>(
     type: TelemetryTraceEvent['type'],
     traceId: string,
-    telemetryTrace: KnownTelemetryTrace,
-    data?: unknown,
+    telemetryTrace: DefinedTelemetryTrace<Data>,
+    data?: Data,
   ) {
     logEntries$.next({
       sessionId,
@@ -40,9 +61,9 @@ export function createStore(sessionId: SessionId): {
     })
   }
 
-  function pushLogEntry<Schema extends ZodType>(
+  function pushLogEntry<Data>(
     type: TelemetryLogEvent['type'],
-    event: KnownTelemetryLogEvent,
+    event: DefinedTelemetryLog<Data>,
     data?: unknown,
   ) {
     logEntries$.next({
@@ -55,29 +76,24 @@ export function createStore(sessionId: SessionId): {
     })
   }
 
-  function createTrace<Schema extends ZodType>(
+  function createTrace<Data = void>(
     traceId: string,
-    traceDef: KnownTelemetryTrace<Schema>,
-  ): TelemetryTrace<Schema> {
+    traceDef: DefinedTelemetryTrace<Data>,
+  ): TelemetryTrace<Data> {
     return {
       start() {
         pushTraceEntry('trace.start', traceId, traceDef)
       },
       newContext(name: string): TelemetryLogger {
         return {
-          trace: (innerTraceDef: KnownTelemetryTrace) => {
-            return createTrace(`${traceId}.${name}`, innerTraceDef)
+          trace<InnerData>(innerTraceDef: DefinedTelemetryTrace<InnerData>) {
+            return createTrace<InnerData>(`${traceId}.${name}`, innerTraceDef)
           },
           log,
         }
       },
       log(data?: unknown) {
-        const result = traceDef.schema.safeParse(data)
-        if (result.success) {
-          pushTraceEntry('trace.log', traceId, traceDef, result.data)
-        } else {
-          // ignore
-        }
+        pushTraceEntry('trace.log', traceId, traceDef, data)
       },
       complete() {
         pushTraceEntry('trace.complete', traceId, traceDef)
@@ -85,12 +101,11 @@ export function createStore(sessionId: SessionId): {
       error(error: Error) {
         pushTraceEntry('trace.error', traceId, traceDef, error)
       },
-      await<P extends Promise<unknown>>(promise: P, data?: z.infer<Schema>): P {
-        const dataPassed = arguments.length > 1
+      await<P extends Promise<Data>>(promise: P, data?: Data): P {
         this.start()
         promise.then(
           (result) => {
-            this.log(dataPassed ? data : result)
+            this.log(data ? data : result)
             this.complete()
             return result
           },
@@ -104,20 +119,14 @@ export function createStore(sessionId: SessionId): {
     }
   }
 
-  function log<Schema extends ZodType>(
-    event: KnownTelemetryLogEvent<Schema>,
-    data?: z.infer<Schema>,
-  ) {
-    const result = event.schema.safeParse(data)
-    if (result.success) {
-      pushLogEntry('log', event, data)
-    }
+  function log<Data>(event: DefinedTelemetryLog<Data>, data?: Data) {
+    pushLogEntry('log', event, data)
   }
 
   return {
     events$: logEntries$.asObservable(),
     logger: {
-      trace: (traceDef: KnownTelemetryTrace) => {
+      trace: <Data>(traceDef: DefinedTelemetryTrace<Data>) => {
         const traceId = createTraceId()
         return createTrace(traceId, traceDef)
       },

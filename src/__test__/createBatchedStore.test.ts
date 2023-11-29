@@ -1,7 +1,7 @@
 import {expect, test, vi} from 'vitest'
 import {createBatchedStore} from '../createBatchedStore'
-import {ExampleEvent, ExampleTrace} from '../events'
 import {createSessionId} from '../'
+import {ExampleEvent, ExampleTrace} from './exampleEvents.telemetry'
 
 test('Logging an example event', async () => {
   const sendEvents = vi.fn().mockResolvedValue(undefined)

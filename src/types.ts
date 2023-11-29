@@ -1,26 +1,19 @@
-import {z, ZodType, ZodUndefined} from 'zod'
-
-export type KnownTelemetryEventName = string & {__type: 'TelemetryName'}
-
-export interface TelemetryLogOptions<Schema extends ZodType | undefined> {
+export interface TelemetryLogOptions {
   name: string
   version: number
   displayName: string
   description: string
-  schema?: Schema
 }
 
-export interface TelemetryTraceOptions<Schema extends ZodType> {
+export interface TelemetryTraceOptions {
   name: string
   version: number
   displayName: string
   description: string
-  schema?: Schema
-  steps?: Record<string, TelemetryTraceOptions<ZodType>>
 }
 
-export interface KnownTelemetryLogEvent<Schema extends ZodType = ZodType> {
-  name: KnownTelemetryEventName
+export interface DefinedTelemetryLog<Schema> {
+  name: string
   type: 'log'
   version: number
   displayName: string
@@ -28,24 +21,23 @@ export interface KnownTelemetryLogEvent<Schema extends ZodType = ZodType> {
   schema: Schema
 }
 
-export interface KnownTelemetryTrace<Schema extends ZodType = ZodType> {
-  name: KnownTelemetryEventName
+export interface DefinedTelemetryTrace<Data = void> {
+  name: string
   type: 'trace'
   version: number
   displayName: string
   description: string
-  schema: Schema
-  steps?: Record<string, TelemetryTraceOptions<ZodType>>
+  schema: Data
 }
 
-export interface TelemetryTrace<Schema extends ZodType = ZodType> {
+export interface TelemetryTrace<Data> {
   start(): void
-  log(data: z.infer<Schema>): void
+  log(data: Data): void
   error(error: Error): void
   complete(): void
   newContext(name: string): TelemetryLogger
-  await<P extends Promise<unknown>>(promise: P, finalData: z.infer<Schema>): P
-  await<P extends Promise<unknown>>(promise: P): P
+  await<P extends Promise<Data>>(promise: P): P
+  await<P extends Promise<unknown>>(promise: P, finalData: Data): P
 }
 
 /**
@@ -55,20 +47,14 @@ export interface TelemetryLogger {
   /*
    * Log a single event, typically a user action, e.g. "Publish"-button clicked
    */
-  log<Schema extends ZodType = ZodType>(
-    event: KnownTelemetryLogEvent<Schema>,
-    data: z.infer<Schema>,
-  ): void
-
-  log<Schema extends ZodUndefined>(event: KnownTelemetryLogEvent<Schema>): void
+  log<Data>(event: DefinedTelemetryLog<Data>, data: Data): void
+  log<Data extends void>(event: DefinedTelemetryLog<Data>): void
 
   /*
    * Trace an operation that may take some time and consist of multiple steps, and that could potentially fail, e.g. request to mutate a document
    * Suitable for use with async/await or Observables
    */
-  trace<Schema extends ZodType = ZodType>(
-    event: KnownTelemetryTrace<Schema>,
-  ): TelemetryTrace<Schema>
+  trace<Data>(event: DefinedTelemetryTrace<Data>): TelemetryTrace<Data>
 }
 
 export type TelemetryLogEvent = {
@@ -116,6 +102,7 @@ export type TelemetryTraceCompleteEvent<T = unknown> = {
   createdAt: string
   data: T
 }
+
 export type TelemetryTraceEvent =
   | TelemetryTraceStartEvent
   | TelemetryTraceLogEvent

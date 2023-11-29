@@ -1,14 +1,15 @@
 import {parseArgs} from 'node:util'
+
+import type {TelemetryEvent, TelemetryLogger} from '@sanity/telemetry'
+import {createBatchedStore, createSessionId} from '@sanity/telemetry'
+import {promises as readline} from 'node:readline'
+import {stdin as input, stdout as output} from 'node:process'
 import {
   ExampleCliAction,
   ExampleCliHelpCommand,
   ExampleCliInitCommand,
   ExampleCliStart,
-} from '../../src/events'
-import type {TelemetryEvent, TelemetryLogger} from '@sanity/telemetry'
-import {createBatchedStore, createSessionId} from '@sanity/telemetry'
-import {promises as readline} from 'node:readline'
-import {stdin as input, stdout as output} from 'node:process'
+} from './cli.telemetry'
 
 async function resolveConsent() {
   return {

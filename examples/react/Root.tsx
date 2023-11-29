@@ -2,7 +2,7 @@ import {ReactNode} from 'react'
 import type {TelemetryEvent} from '@sanity/telemetry'
 import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 import {TelemetryProvider} from '@sanity/telemetry/react'
-import {StudioMount} from '@sanity/telemetry/events'
+import {StudioMount} from './studio.telemetry'
 
 // Implementation of this could look at env vars, project consent, etc
 async function resolveConsent() {

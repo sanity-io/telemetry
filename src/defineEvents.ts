@@ -1,41 +1,38 @@
 import {
-  KnownTelemetryEventName,
-  KnownTelemetryLogEvent,
-  KnownTelemetryTrace,
+  DefinedTelemetryLog,
+  DefinedTelemetryTrace,
   TelemetryLogOptions,
   TelemetryTraceOptions,
 } from './types'
-import {z, ZodType, ZodUndefined} from 'zod'
 
 /**
  * @param options
- * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  */
-export function defineLogEvent<Schema extends ZodType = ZodUndefined>(
-  options: TelemetryLogOptions<Schema>,
-): KnownTelemetryLogEvent<Schema> {
+export function defineLogEvent<Data = void>(
+  options: TelemetryLogOptions,
+): DefinedTelemetryLog<Data> {
   return {
     type: 'log',
-    name: options.name as KnownTelemetryEventName,
+    name: options.name,
     version: options.version,
     displayName: options.displayName,
     description: options.description,
-    schema: (options.schema || z.undefined()) as Schema,
+    schema: undefined as unknown as Data,
   }
 }
+
 /**
  * @param options
- * @internal - this has to be internal to guarantee that all events are defined centrally in this package
  * */
-export function defineTraceEvent<Schema extends ZodType = ZodUndefined>(
-  options: TelemetryTraceOptions<Schema>,
-): KnownTelemetryTrace<Schema> {
+export function defineTraceEvent<Data = void>(
+  options: TelemetryTraceOptions,
+): DefinedTelemetryTrace<Data> {
   return {
     type: 'trace',
-    name: options.name as KnownTelemetryEventName,
+    name: options.name,
     version: options.version,
     displayName: options.displayName,
     description: options.description,
-    schema: (options.schema || z.undefined()) as Schema,
+    schema: undefined as unknown as Data,
   }
 }

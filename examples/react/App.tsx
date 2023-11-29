@@ -1,9 +1,10 @@
 import {useState} from 'react'
+
+import {useTelemetry} from '@sanity/telemetry/react'
 import {
   ExampleIncrementButtonClick,
   ExampleSaveComment,
-} from '@sanity/telemetry/events'
-import {useTelemetry} from '@sanity/telemetry/react'
+} from './studio.telemetry'
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
