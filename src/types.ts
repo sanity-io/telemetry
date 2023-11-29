@@ -16,6 +16,7 @@ export interface TelemetryTraceOptions<Schema extends ZodType> {
   displayName: string
   description: string
   schema?: Schema
+  steps?: Record<string, TelemetryTraceOptions<ZodType>>
 }
 
 export interface KnownTelemetryLogEvent<Schema extends ZodType = ZodType> {
@@ -34,6 +35,7 @@ export interface KnownTelemetryTrace<Schema extends ZodType = ZodType> {
   displayName: string
   description: string
   schema: Schema
+  steps?: Record<string, TelemetryTraceOptions<ZodType>>
 }
 
 export interface TelemetryTrace<Schema extends ZodType = ZodType> {
@@ -41,7 +43,8 @@ export interface TelemetryTrace<Schema extends ZodType = ZodType> {
   log(data: z.infer<Schema>): void
   error(error: Error): void
   complete(): void
-  await<P extends Promise<unknown>>(promise: P, data: z.infer<Schema>): P
+  newContext(name: string): TelemetryLogger
+  await<P extends Promise<unknown>>(promise: P, finalData: z.infer<Schema>): P
   await<P extends Promise<unknown>>(promise: P): P
 }
 

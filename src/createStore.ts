@@ -55,13 +55,21 @@ export function createStore(sessionId: SessionId): {
     })
   }
 
-  function trace<Schema extends ZodType>(
+  function createTrace<Schema extends ZodType>(
+    traceId: string,
     traceDef: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
-    const traceId = createTraceId()
     return {
       start() {
         pushTraceEntry('trace.start', traceId, traceDef)
+      },
+      newContext(name: string): TelemetryLogger {
+        return {
+          trace: (innerTraceDef: KnownTelemetryTrace) => {
+            return createTrace(`${traceId}.${name}`, innerTraceDef)
+          },
+          log,
+        }
       },
       log(data?: unknown) {
         const result = traceDef.schema.safeParse(data)
@@ -109,7 +117,10 @@ export function createStore(sessionId: SessionId): {
   return {
     events$: logEntries$.asObservable(),
     logger: {
-      trace,
+      trace: (traceDef: KnownTelemetryTrace) => {
+        const traceId = createTraceId()
+        return createTrace(traceId, traceDef)
+      },
       log,
     },
   }

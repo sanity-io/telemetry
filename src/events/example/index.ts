@@ -1,7 +1,7 @@
 import {z} from 'zod'
-import {_defineLogEvent, _defineTraceEvent} from '../../internal'
+import {defineLogEvent, defineTraceEvent} from '../../defineEvents'
 
-export const ExampleIncrementButtonClick = _defineLogEvent({
+export const ExampleIncrementButtonClick = defineLogEvent({
   name: 'ExampleIncrementButtonClick',
   version: 1,
   displayName: 'Increment button clicked',
@@ -9,7 +9,7 @@ export const ExampleIncrementButtonClick = _defineLogEvent({
   schema: z.object({count: z.number()}),
 })
 
-export const ExampleTrace = _defineTraceEvent({
+export const ExampleTrace = defineTraceEvent({
   name: 'ExampleTrace',
   version: 1,
   displayName: 'Example Trace',
@@ -17,7 +17,7 @@ export const ExampleTrace = _defineTraceEvent({
   schema: z.object({step: z.string()}),
 })
 
-export const ExampleEvent = _defineLogEvent({
+export const ExampleEvent = defineLogEvent({
   name: 'ExampleEvent',
   version: 1,
   displayName: 'An example event',
@@ -25,7 +25,7 @@ export const ExampleEvent = _defineLogEvent({
   schema: z.object({foo: z.literal('bar')}),
 })
 
-export const ExampleSaveComment = _defineTraceEvent({
+export const ExampleSaveComment = defineTraceEvent({
   name: 'ExampleSaveComment',
   version: 1,
   displayName: 'Save comment',
@@ -33,17 +33,31 @@ export const ExampleSaveComment = _defineTraceEvent({
   schema: z.object({ok: z.boolean()}).optional(),
 })
 
-export const ExampleCliStart = _defineLogEvent({
+export const ExampleCliStart = defineLogEvent({
   name: 'ExampleCliStart',
   version: 1,
   displayName: 'Example CLI start',
   description: 'Example CLI started',
   schema: z.object({nodeVersion: z.string()}),
 })
-export const ExampleCliAction = _defineTraceEvent({
+export const ExampleCliAction = defineTraceEvent({
   name: 'ExampleCliActionBegin',
   version: 1,
   displayName: 'Example CLI action trace',
   description: 'Example CLI action trace',
   schema: z.object({actionName: z.string()}),
+})
+
+export const ExampleCliInitCommand = defineTraceEvent({
+  name: 'ExampleCliInit',
+  version: 1,
+  displayName: 'Example CLI init trace',
+  description: 'Example CLI init action trace',
+  schema: z.object({step: z.string()}),
+})
+export const ExampleCliHelpCommand = defineLogEvent({
+  name: 'ExampleCliInit',
+  version: 1,
+  displayName: 'Example CLI init trace',
+  description: 'Example CLI init action trace',
 })

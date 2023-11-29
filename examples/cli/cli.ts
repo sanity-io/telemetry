@@ -1,5 +1,10 @@
 import {parseArgs} from 'node:util'
-import {ExampleCliAction, ExampleCliStart} from '../../src/events'
+import {
+  ExampleCliAction,
+  ExampleCliHelpCommand,
+  ExampleCliInitCommand,
+  ExampleCliStart,
+} from '../../src/events'
 import type {TelemetryEvent, TelemetryLogger} from '@sanity/telemetry'
 import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 import {promises as readline} from 'node:readline'
@@ -10,6 +15,8 @@ async function resolveConsent() {
     status: process.env.TELEMETRY === 'false' ? 'denied' : 'granted',
   } as const
 }
+
+type CliContext = {telemetry: TelemetryLogger}
 
 const sessionId = createSessionId()
 
@@ -39,24 +46,43 @@ const {values, positionals} = parseArgs({
   },
 })
 
-async function runInit() {
-  const rl = readline.createInterface({input, output})
-  await rl.question('Press enter to exit\n\n')
-  rl.close()
+const actions: Record<string, (context: CliContext) => void> = {
+  init: async function runInit(context: CliContext) {
+    const trace = context.telemetry.trace(ExampleCliInitCommand)
+    trace.start()
+    trace.log({step: 'start'})
+    const rl = readline.createInterface({input, output})
+    await rl.question('Press enter to exit\n\n')
+    rl.close()
+    trace.log({step: 'end'})
+    trace.complete()
+  },
+  help: async function runHelp(context: CliContext) {
+    context.telemetry.log(ExampleCliHelpCommand)
+    // eslint-disable-next-line no-console
+    console.log('output some help!')
+  },
+}
+function runAction(name: string, ctx: CliContext) {
+  if (!(name in actions)) {
+    throw new Error(`Unknown action "${name}"`)
+  }
+  return Promise.resolve(actions[name](ctx))
 }
 
 // imaginary cli entry point
 async function cli(
   args: string[],
   flags: Record<string, string | boolean | undefined>,
-  ctx: {telemetry: TelemetryLogger},
+  ctx: CliContext,
 ) {
   ctx.telemetry.log(ExampleCliStart, {nodeVersion: process.version})
 
-  const trace = ctx.telemetry.trace(ExampleCliAction)
-  if (args[0] === 'init') {
-    await trace.await(runInit(), {actionName: args[0]})
-  }
+  const action = ctx.telemetry.trace(ExampleCliAction)
+  await action.await(
+    runAction(args[0], {telemetry: action.newContext('runAction')}),
+    {actionName: args[0]},
+  )
 }
 
 process.on('beforeExit', async () => {

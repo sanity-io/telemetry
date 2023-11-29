@@ -7,6 +7,10 @@ import type {
 import {TypeOf, z, ZodType} from 'zod'
 
 export function createNoopLogger(): TelemetryLogger {
+  const logger = {
+    trace,
+    log,
+  }
   function trace<Schema extends ZodType>(
     telemetryTrace: KnownTelemetryTrace<Schema>,
   ): TelemetryTrace<Schema> {
@@ -14,6 +18,9 @@ export function createNoopLogger(): TelemetryLogger {
       start() {},
       log(data?: unknown) {},
       complete() {},
+      newContext(name: string) {
+        return logger
+      },
       error(error: Error) {},
       await: (promise) => promise,
     }
@@ -24,8 +31,5 @@ export function createNoopLogger(): TelemetryLogger {
     data?: z.infer<Schema>,
   ) {}
 
-  return {
-    trace,
-    log,
-  }
+  return logger
 }

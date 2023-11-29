@@ -1,7 +1,7 @@
-import {_defineLogEvent, _defineTraceEvent} from '../../internal'
+import {defineLogEvent, defineTraceEvent} from '../../defineEvents'
 import {discriminatedUnion, union, z} from 'zod'
 
-export const CliStart = _defineLogEvent({
+export const CliStart = defineLogEvent({
   name: 'cliStartEvent',
   version: 1,
   displayName: 'sanity cli started',
@@ -9,13 +9,10 @@ export const CliStart = _defineLogEvent({
   schema: z.object({nodeVersion: z.string(), cliVersion: z.string()}),
 })
 
-const commonCommandProps = z.object({duration: z.number()})
-
 const nullCommand = z.object({commandName: z.null()})
 const startCommand = z.object({commandName: z.literal('start')})
-const commands = discriminatedUnion('commandName', [nullCommand, startCommand])
 
-export const CliCommand = _defineTraceEvent({
+export const CliCommand = defineTraceEvent({
   name: 'cliCommand',
   version: 1,
   displayName: 'CLI action',
