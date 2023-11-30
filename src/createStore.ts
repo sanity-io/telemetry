@@ -22,12 +22,21 @@ export function createStore(sessionId: SessionId): {
 } {
   const logEntries$ = new Subject<TelemetryEvent>()
 
-  function pushTraceEntry<Data, Err extends {message: string}>(
-    type: 'trace.error',
+  function pushTraceError<Data, Err extends {message: string}>(
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
     error: {message: string},
-  ): void
+  ) {
+    logEntries$.next({
+      sessionId,
+      type: 'trace.error',
+      traceId,
+      name: telemetryTrace.name,
+      version: telemetryTrace.version,
+      data: {message: error.message},
+      createdAt: new Date().toISOString(),
+    })
+  }
   function pushTraceEntry<Data>(
     type: 'trace.start',
     traceId: string,
@@ -44,6 +53,7 @@ export function createStore(sessionId: SessionId): {
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
   ): void
+
   function pushTraceEntry<Data>(
     type: TelemetryTraceEvent['type'],
     traceId: string,
@@ -98,8 +108,8 @@ export function createStore(sessionId: SessionId): {
       complete() {
         pushTraceEntry('trace.complete', traceId, traceDef)
       },
-      error(error: Error) {
-        pushTraceEntry('trace.error', traceId, traceDef, error)
+      error(error: {message: string}) {
+        pushTraceError(traceId, traceDef, error)
       },
       await<P extends Promise<Data>>(promise: P, data?: Data): P {
         this.start()

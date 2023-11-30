@@ -8,7 +8,7 @@ import {
 /**
  * @param options
  */
-export function defineLogEvent<Data = void>(
+export function defineEvent<Data = void>(
   options: TelemetryLogOptions,
 ): DefinedTelemetryLog<Data> {
   return {
@@ -24,7 +24,7 @@ export function defineLogEvent<Data = void>(
 /**
  * @param options
  * */
-export function defineTraceEvent<Data = void>(
+export function defineTrace<Data = void>(
   options: TelemetryTraceOptions,
 ): DefinedTelemetryTrace<Data> {
   return {
