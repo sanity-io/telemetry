@@ -57,6 +57,25 @@ try {
 }
 ```
 
+### Trace promise helper
+
+As an alternative, you can also use the `await` helper to automatically mark the trace as completed or failed when
+the promise resolves or rejects:
+
+```typescript
+async function performSomeAction() {
+  //…
+}
+const trace = logger.trace(exampleTrace)
+const res = trace.await(performSomeAction())
+```
+
+This will return the same promise as `performSomeAction()`, but the trace will be marked as completed or failed when the promise resolves or rejects. It will call trace.start() immediately, and will log the value the promise resolves to, or the error it rejects with. To specify a custom data to log, pass it as the second argument:
+
+```typescript
+trace.await(performSomeAction(), {foo: 'this will be logged when the action completes'})
+```
+
 ### Trace contexts
 
 When logging events from an application, it can be useful to know more about the context of which a particular method or component has been called. Usually, an application comprises re-usable functions and components that's called from several entry points. For example, a `login()` helper function that logs in the current user may be invoked by both the `query` command and the `init` command. The `login()` function should remain agnostic about who invoked it, and be able to log telemetry events without having to attach this contextual information. To help with this, trace.newContext() returns a new `TelemetryLogger` interface that encapsulates this information to the event data that gets logged. This TelemetryLogger instance can then be passed on as the telemetry logger to the `login()` method, and in effect make the contextual information completely transparent for the `login()` method.
@@ -85,25 +104,6 @@ if (!loggedIn) {
 ```
 
 Now, the login() method only sees a telemetry value that implements `TelemetryLogger`, and doesn't need to know anything about its context. The `login()` helper itself may also branch out to other helpers, creating new contexts for functions re-used across the application.
-
-### Trace promise helper
-
-As an alternative, you can also use the `await` helper to automatically mark the trace as completed or failed when
-the promise resolves or rejects:
-
-```typescript
-async function performSomeAction() {
-  //…
-}
-const trace = logger.trace(exampleTrace)
-const res = trace.await(performSomeAction())
-```
-
-This will return the same promise as `performSomeAction()`, but the trace will be marked as completed or failed when the promise resolves or rejects. It will call trace.start() immediately, and will log the value the promise resolves to, or the error it rejects with. To specify a custom data to log, pass it as the second argument:
-
-```typescript
-trace.await(performSomeAction(), {foo: 'this will be logged when the action completes'})
-```
 
 ## Configuration
 The telemetry store needs a single point of configuration for the environment/runtime
