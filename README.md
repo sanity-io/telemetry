@@ -7,14 +7,14 @@ Utils for collecting telemetry data from Sanity CLI and Sanity Studio
 ### Track a one-off event
 
 ```typescript
-import { defineEvent } from "@sanity/telemetry"
+import {defineEvent} from '@sanity/telemetry'
 
 const ExampleEvent = defineEvent<{foo: string}>({
-  name: "Example Event",
-  version: 1
+  name: 'Example Event',
+  version: 1,
 })
 
-telemetry.log(ExampleEvent, { foo: 'bar' })
+telemetry.log(ExampleEvent, {foo: 'bar'})
 ```
 
 ### Track a group of events in a trace
@@ -33,7 +33,7 @@ import {defineTrace} from '@sanity/telemetry'
 
 const ExampleTrace = defineTrace({
   name: 'Example Trace',
-  version: 1
+  version: 1,
 })
 
 type TraceData = {
@@ -73,7 +73,9 @@ const res = trace.await(performSomeAction())
 This will return the same promise as `performSomeAction()`, but the trace will be marked as completed or failed when the promise resolves or rejects. It will call trace.start() immediately, and will log the value the promise resolves to, or the error it rejects with. To specify a custom data to log, pass it as the second argument:
 
 ```typescript
-trace.await(performSomeAction(), {foo: 'this will be logged when the action completes'})
+trace.await(performSomeAction(), {
+  foo: 'this will be logged when the action completes',
+})
 ```
 
 ### Trace contexts
@@ -91,6 +93,7 @@ if (!loggedIn) {
 }
 //…
 ```
+
 ```ts
 // init command
 
@@ -106,6 +109,7 @@ if (!loggedIn) {
 Now, the login() method only sees a telemetry value that implements `TelemetryLogger`, and doesn't need to know anything about its context. The `login()` helper itself may also branch out to other helpers, creating new contexts for functions re-used across the application.
 
 ## Configuration
+
 The telemetry store needs a single point of configuration for the environment/runtime
 
 ### Browser
@@ -116,7 +120,6 @@ import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 const sessionId = createSessionId()
 
 const store = createBatchedStore(sessionId, {
-
   // submit any pending events every 30s
   flushInterval: 30000,
 
@@ -133,15 +136,13 @@ const store = createBatchedStore(sessionId, {
   // opt into a different strategy for sending events when the browser close, reload or navigate away from the current page (optional)
   sendBeacon: (events) => {
     //…
-  }
+  },
 })
-
 
 // This makes sure that the browser flushes any pending events before the user navigates away
 // This should only be called once
 // if you wish to unregister lifecycle listeners later on, (e.g. in a React hook's cleanup), you can do so by calling unregister()
 const unregister = registerLifecycleEvents(store)
-
 ```
 
 ### React
@@ -152,7 +153,6 @@ import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 const sessionId = createSessionId()
 
 const store = createBatchedStore(sessionId, {
-
   // submit any pending events every 30s
   flushInterval: 10000,
 
@@ -169,7 +169,7 @@ const store = createBatchedStore(sessionId, {
   // opt into a different strategy for sending events when the browser close, reload or navigate away from the current page (recommended)
   sendBeacon: (events) => {
     //…
-  }
+  },
 })
 
 // Wrap the app in a TelemetryProvider
@@ -197,7 +197,6 @@ function App() {
 }
 ```
 
-
 ### Node.js/CLI
 
 ```typescript
@@ -206,7 +205,6 @@ import {createBatchedStore, createSessionId} from '@sanity/telemetry'
 const sessionId = createSessionId()
 
 const store = createBatchedStore(sessionId, {
-
   // submit any pending events every 30s
   flushInterval: 30000,
 

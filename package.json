@@ -12,9 +12,6 @@
     "url": "git+ssh://git@github.com/sanity-io/telemetry.git"
   },
   "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
   "author": "Bjørge Næss <bjoerge@sanity.io>",
   "type": "module",
   "exports": {
@@ -34,6 +31,10 @@
     },
     "./package.json": "./package.json"
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
       "events": [
@@ -44,10 +45,6 @@
       ]
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "source": "./src/index.ts",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -110,5 +107,8 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
