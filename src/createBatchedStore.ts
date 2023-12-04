@@ -3,7 +3,6 @@ import {
   catchError,
   concatMap,
   EMPTY,
-  filter,
   from,
   lastValueFrom,
   map,
@@ -11,11 +10,16 @@ import {
   Observable,
   tap,
   throttle,
-  throttleTime,
 } from 'rxjs'
 import {SessionId} from './createSessionId'
 import {createStore} from './createStore'
 
+/**
+ * This is like rxjs.timer() except for that it's calling timeout.unref()
+ * This prevents the timer from keeping the event loop active https://nodejs.org/api/timers.html#timeoutunref
+ * We don't want any of our timers to hold up the process from completing
+ * @param ms
+ */
 const unrefTimer = (ms: number) =>
   new Observable((subscriber) => {
     const timeout = setTimeout(() => {

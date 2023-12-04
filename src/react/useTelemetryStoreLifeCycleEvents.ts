@@ -1,6 +1,6 @@
 import type {TelemetryStore} from '../types'
 import {useEffect} from 'react'
-import {onPageHide, onVisibilityHidden} from '../utils/setupLifeCycleListeners'
+import {onPageHide, onVisibilityHidden} from '../utils/browserEvents'
 
 export function useTelemetryStoreLifeCycleEvents(store: TelemetryStore) {
   // when visibility changes to hidden, flush events, but continue tracking

@@ -1,3 +1,5 @@
+import {TelemetryStore} from '@sanity/telemetry'
+
 const capture = {capture: true}
 
 function listen(target: EventTarget, type: string, cb: () => void) {
@@ -26,4 +28,13 @@ export function onVisibilityHidden(cb: () => void) {
       cb()
     }
   })
+}
+
+export function registerLifecycleEvents(store: TelemetryStore) {
+  const unregisterVisibilityHidden = onVisibilityHidden(() => store.flush())
+  const unregisterPageHide = onPageHide(() => store.endWithBeacon())
+  return () => {
+    unregisterPageHide()
+    unregisterVisibilityHidden()
+  }
 }

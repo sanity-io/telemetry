@@ -1,32 +1,44 @@
 export interface TelemetryLogOptions {
+  /** Unique name of the event */
   name: string
+  /** Event version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
   version: number
-  displayName: string
+  /** Description of log event */
   description: string
 }
 
 export interface TelemetryTraceOptions {
+  /** Unique name of the event */
   name: string
+  /** Event version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
   version: number
-  displayName: string
+  /** Description of log event */
   description: string
 }
 
 export interface DefinedTelemetryLog<Schema> {
-  name: string
   type: 'log'
+  /** Unique name of the event */
+  name: string
+
+  /** Event version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
   version: number
-  displayName: string
-  description: string
+
+  /** Description of log event */
+  description?: string
+  /** Data schema. Will not be accessible at runtime */
   schema: Schema
 }
 
 export interface DefinedTelemetryTrace<Data = void> {
-  name: string
   type: 'trace'
+  /** Unique name of the trace */
+  name: string
+  /** Trace version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
   version: number
-  displayName: string
-  description: string
+  /** Description of trace */
+  description?: string
+  /** Data schema. Will not be accessible at runtime */
   schema: Data
 }
 

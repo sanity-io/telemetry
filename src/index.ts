@@ -1,7 +1,7 @@
 export * from './createSessionId'
 export * from './createBatchedStore'
 export * from './types'
-export * from './utils/setupLifeCycleListeners'
+export * from './utils/browserEvents'
 
-export {defineEvent} from './defineEvents'
-export {defineTrace} from './defineEvents'
+export {defineEvent} from './defineEvent'
+export {defineTrace} from './defineTrace'
