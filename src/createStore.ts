@@ -16,9 +16,9 @@ import {createTraceId} from './createTraceId'
  * @internal
  * @param sessionId
  */
-export function createStore(sessionId: SessionId): {
+export function createStore<UserProperties>(sessionId: SessionId): {
   events$: Observable<TelemetryEvent>
-  logger: TelemetryLogger
+  logger: TelemetryLogger<UserProperties>
 } {
   const logEntries$ = new Subject<TelemetryEvent>()
 
@@ -86,19 +86,29 @@ export function createStore(sessionId: SessionId): {
     })
   }
 
+  function pushUserPropertiesEntry(properties: UserProperties) {
+    logEntries$.next({
+      sessionId,
+      type: 'userProperties',
+      properties: properties,
+      createdAt: new Date().toISOString(),
+    })
+  }
+
   function createTrace<Data = void>(
     traceId: string,
     traceDef: DefinedTelemetryTrace<Data>,
-  ): TelemetryTrace<Data> {
+  ): TelemetryTrace<UserProperties, Data> {
     return {
       start() {
         pushTraceEntry('trace.start', traceId, traceDef)
       },
-      newContext(name: string): TelemetryLogger {
+      newContext(name: string): TelemetryLogger<UserProperties> {
         return {
           trace<InnerData>(innerTraceDef: DefinedTelemetryTrace<InnerData>) {
             return createTrace<InnerData>(`${traceId}.${name}`, innerTraceDef)
           },
+          updateUserProperties() {},
           log,
         }
       },
@@ -136,6 +146,9 @@ export function createStore(sessionId: SessionId): {
   return {
     events$: logEntries$.asObservable(),
     logger: {
+      updateUserProperties(properties: UserProperties) {
+        pushUserPropertiesEntry(properties)
+      },
       trace: <Data>(traceDef: DefinedTelemetryTrace<Data>) => {
         const traceId = createTraceId()
         return createTrace(traceId, traceDef)

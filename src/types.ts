@@ -6,6 +6,10 @@ export interface TelemetryLogOptions {
   /** Description of log event */
   description: string
 }
+export interface TelemetryUserPropertyOptions {
+  /** Data format version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
+  version: number
+}
 
 export interface TelemetryTraceOptions {
   /** Unique name of the event */
@@ -30,6 +34,17 @@ export interface DefinedTelemetryLog<Schema> {
   schema: Schema
 }
 
+export interface DefinedUserProperties<Schema> {
+  type: 'userProperties'
+  /** Unique name of the event */
+
+  /** Data format version. Increment this by 1 whenever the shape of the data changes in a non-backwards compatible way */
+  version: number
+
+  /** Data schema. Will not be accessible at runtime */
+  schema: Schema
+}
+
 export interface DefinedTelemetryTrace<Data = void> {
   type: 'trace'
   /** Unique name of the trace */
@@ -42,12 +57,12 @@ export interface DefinedTelemetryTrace<Data = void> {
   schema: Data
 }
 
-export interface TelemetryTrace<Data> {
+export interface TelemetryTrace<UserProperties, Data> {
   start(): void
   log(data: Data): void
   error(error: Error): void
   complete(): void
-  newContext(name: string): TelemetryLogger
+  newContext(name: string): TelemetryLogger<UserProperties>
   await<P extends Promise<Data>>(promise: P): P
   await<P extends Promise<unknown>>(promise: P, finalData: Data): P
 }
@@ -55,7 +70,9 @@ export interface TelemetryTrace<Data> {
 /**
  * Note that `sessionId` is removed from the signature of these functions
  */
-export interface TelemetryLogger {
+export interface TelemetryLogger<UserProperties> {
+  updateUserProperties(properties: UserProperties): void
+
   /*
    * Log a single event, typically a user action, e.g. "Publish"-button clicked
    */
@@ -66,7 +83,9 @@ export interface TelemetryLogger {
    * Trace an operation that may take some time and consist of multiple steps, and that could potentially fail, e.g. request to mutate a document
    * Suitable for use with async/await or Observables
    */
-  trace<Data>(event: DefinedTelemetryTrace<Data>): TelemetryTrace<Data>
+  trace<Data>(
+    event: DefinedTelemetryTrace<Data>,
+  ): TelemetryTrace<UserProperties, Data>
 }
 
 export type TelemetryLogEvent = {
@@ -76,6 +95,13 @@ export type TelemetryLogEvent = {
   sessionId: string
   createdAt: string
   data: unknown
+}
+
+export type TelemetryUserPropertiesEvent = {
+  type: 'userProperties'
+  sessionId: string
+  createdAt: string
+  properties: unknown
 }
 
 export type TelemetryTraceStartEvent = {
@@ -121,10 +147,13 @@ export type TelemetryTraceEvent =
   | TelemetryTraceErrorEvent
   | TelemetryTraceCompleteEvent
 
-export type TelemetryEvent = TelemetryLogEvent | TelemetryTraceEvent
+export type TelemetryEvent =
+  | TelemetryLogEvent
+  | TelemetryTraceEvent
+  | TelemetryUserPropertiesEvent
 
-export interface TelemetryStore {
-  logger: TelemetryLogger
+export interface TelemetryStore<UserProperties> {
+  logger: TelemetryLogger<UserProperties>
   end: () => void
   endWithBeacon: () => boolean
   flush: () => Promise<void>

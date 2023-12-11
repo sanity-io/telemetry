@@ -23,11 +23,16 @@ function formatTraceEvent(trace: TelemetryTraceEvent) {
 }
 
 function formatEvent(event: TelemetryEvent) {
+  if (event.type === 'userProperties') {
+    return [`[telemetry][${event.type}]`, event.properties]
+  }
   return event.type == 'log' ? formatLogEvent(event) : formatTraceEvent(event)
 }
 
-export function createConsoleLogStore(sessionId: SessionId): TelemetryStore {
-  const store = createStore(sessionId)
+export function createConsoleLogStore<UserProperties>(
+  sessionId: SessionId,
+): TelemetryStore<UserProperties> {
+  const store = createStore<UserProperties>(sessionId)
 
   function log(event: TelemetryEvent) {
     console.log(...formatEvent(event))

@@ -30,7 +30,7 @@ export function onVisibilityHidden(cb: () => void) {
   })
 }
 
-export function registerLifecycleEvents(store: TelemetryStore) {
+export function registerLifecycleEvents(store: TelemetryStore<unknown>) {
   const unregisterVisibilityHidden = onVisibilityHidden(() => store.flush())
   const unregisterPageHide = onPageHide(() => store.endWithBeacon())
   return () => {

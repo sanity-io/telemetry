@@ -6,14 +6,17 @@ import type {
 } from '../types'
 import {TypeOf, z, ZodType} from 'zod'
 
-export function createNoopLogger(): TelemetryLogger {
+export function createNoopLogger<
+  UserProperties,
+>(): TelemetryLogger<UserProperties> {
   const logger = {
+    updateUserProperties() {},
     trace,
     log,
   }
   function trace<Data>(
     telemetryTrace: DefinedTelemetryTrace<Data>,
-  ): TelemetryTrace<Data> {
+  ): TelemetryTrace<UserProperties, Data> {
     return {
       start() {},
       log(data?: unknown) {},

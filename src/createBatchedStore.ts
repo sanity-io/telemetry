@@ -65,11 +65,11 @@ export interface CreateBatchedStoreOptions {
   sendBeacon?: (events: TelemetryEvent[]) => boolean
 }
 
-export function createBatchedStore(
+export function createBatchedStore<UserProperties>(
   sessionId: SessionId,
   options: CreateBatchedStoreOptions,
-): TelemetryStore {
-  const store = createStore(sessionId)
+): TelemetryStore<UserProperties> {
+  const store = createStore<UserProperties>(sessionId)
 
   function resolveConsent(): Promise<{status: ConsentStatus}> {
     return options.resolveConsent().catch((err) =>

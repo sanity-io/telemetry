@@ -7,16 +7,16 @@ import {useTelemetryStoreLifeCycleEvents} from './useTelemetryStoreLifeCycleEven
 /**
  * @internal
  */
-export const TelemetryLoggerContext = createContext<TelemetryLogger>(
+export const TelemetryLoggerContext = createContext<TelemetryLogger<unknown>>(
   createNoopLogger(),
 )
 
-export function TelemetryProvider({
+export function TelemetryProvider<UserProperties>({
   children,
   store,
 }: {
   children: React.ReactNode
-  store: TelemetryStore
+  store: TelemetryStore<UserProperties>
 }) {
   // Hook the telemetry store up to page life cycle events like hide/unload
   useTelemetryStoreLifeCycleEvents(store)

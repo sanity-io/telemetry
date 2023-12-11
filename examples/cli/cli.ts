@@ -17,7 +17,10 @@ async function resolveConsent() {
   } as const
 }
 
-type CliContext = {telemetry: TelemetryLogger}
+interface CliUserProperties {
+  nodeVersion: string
+}
+type CliContext = {telemetry: TelemetryLogger<CliUserProperties>}
 
 const sessionId = createSessionId()
 
