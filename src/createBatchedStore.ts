@@ -1,6 +1,8 @@
 import {TelemetryEvent, TelemetryStore} from './types'
 import {
   catchError,
+  combineLatest,
+  combineLatestAll,
   concatMap,
   EMPTY,
   from,
@@ -8,6 +10,7 @@ import {
   map,
   mergeMap,
   Observable,
+  of,
   tap,
   throttle,
 } from 'rxjs'
@@ -87,21 +90,12 @@ export function createBatchedStore<UserProperties>(
   }
 
   function submit() {
-    if (_buffer.length === 0) {
-      return EMPTY
-    }
-    return from(resolveConsent()).pipe(
-      mergeMap((consent) => {
-        if (consent.status === 'denied') {
-          // consent is denied, so we just clear the buffer
-          consume()
-          return EMPTY
-        }
+    return combineLatest([of(consume()), resolveConsent()]).pipe(
+      mergeMap(([events, consent]) => {
         if (consent.status !== 'granted') {
+          // consent is not granted, we just consumed (cleared) the buffer so we can return empty
           return EMPTY
         }
-        // consent is granted
-        const events = consume()
         return from(options.sendEvents(events)).pipe(
           catchError((err) => {
             // In case of error, put events back on the buffer
