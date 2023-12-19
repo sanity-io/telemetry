@@ -107,7 +107,10 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       },
       newContext(name: string): TelemetryLogger<UserProperties> {
         return {
-          trace<InnerData>(innerTraceDef: DefinedTelemetryTrace<InnerData>) {
+          trace<InnerData>(
+            innerTraceDef: DefinedTelemetryTrace<InnerData>,
+            context?: unknown,
+          ) {
             return createTrace<InnerData>(`${traceId}.${name}`, innerTraceDef)
           },
           updateUserProperties() {},

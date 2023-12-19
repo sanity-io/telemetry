@@ -87,6 +87,7 @@ export interface TelemetryLogger<UserProperties> {
    */
   trace<Data>(
     event: DefinedTelemetryTrace<Data>,
+    context?: unknown,
   ): TelemetryTrace<UserProperties, Data>
 }
 
