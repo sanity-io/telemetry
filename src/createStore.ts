@@ -26,6 +26,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
     error: {message: string},
+    context: unknown,
   ) {
     logEntries$.next({
       sessionId,
@@ -34,41 +35,48 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       name: telemetryTrace.name,
       version: telemetryTrace.version,
       data: {message: error.message},
-      context: telemetryTrace.context,
+      context,
       createdAt: new Date().toISOString(),
     })
   }
+
   function pushTraceEntry<Data>(
     type: 'trace.start',
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
+    data: undefined,
+    context: unknown,
   ): void
   function pushTraceEntry<Data>(
     type: 'trace.log',
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
     data: Data,
+    context: unknown,
   ): void
   function pushTraceEntry<Data>(
     type: 'trace.complete',
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
+    data: Data,
+    context: unknown,
   ): void
 
   function pushTraceEntry<Data>(
     type: TelemetryTraceEvent['type'],
     traceId: string,
     telemetryTrace: DefinedTelemetryTrace<Data>,
-    data?: Data,
+    data: Data,
+    context: unknown,
   ) {
     logEntries$.next({
       sessionId,
       type,
       traceId,
       name: telemetryTrace.name,
-      context: telemetryTrace.context,
       version: telemetryTrace.version,
       data,
+      context,
       createdAt: new Date().toISOString(),
     })
   }
@@ -104,7 +112,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
   ): TelemetryTrace<UserProperties, Data> {
     return {
       start() {
-        pushTraceEntry('trace.start', traceId, traceDef)
+        pushTraceEntry('trace.start', traceId, traceDef, undefined, context)
       },
       newContext(name: string): TelemetryLogger<UserProperties> {
         return {
@@ -120,13 +128,13 @@ export function createStore<UserProperties>(sessionId: SessionId): {
         }
       },
       log(data?: unknown) {
-        pushTraceEntry('trace.log', traceId, traceDef, data)
+        pushTraceEntry('trace.log', traceId, traceDef, data, context)
       },
       complete() {
-        pushTraceEntry('trace.complete', traceId, traceDef)
+        pushTraceEntry('trace.complete', traceId, traceDef, undefined, context)
       },
       error(error: {message: string}) {
-        pushTraceError(traceId, traceDef, error)
+        pushTraceError(traceId, traceDef, error, context)
       },
       await<P extends Promise<Data>>(promise: P, data?: Data): P {
         this.start()
