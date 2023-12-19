@@ -100,6 +100,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
   function createTrace<Data = void>(
     traceId: string,
     traceDef: DefinedTelemetryTrace<Data>,
+    context: unknown,
   ): TelemetryTrace<UserProperties, Data> {
     return {
       start() {
@@ -107,11 +108,12 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       },
       newContext(name: string): TelemetryLogger<UserProperties> {
         return {
-          trace<InnerData>(
-            innerTraceDef: DefinedTelemetryTrace<InnerData>,
-            context?: unknown,
-          ) {
-            return createTrace<InnerData>(`${traceId}.${name}`, innerTraceDef)
+          trace<InnerData>(innerTraceDef: DefinedTelemetryTrace<InnerData>) {
+            return createTrace<InnerData>(
+              `${traceId}.${name}`,
+              innerTraceDef,
+              context,
+            )
           },
           updateUserProperties() {},
           log,
@@ -154,9 +156,12 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       updateUserProperties(properties: UserProperties) {
         pushUserPropertiesEntry(properties)
       },
-      trace: <Data>(traceDef: DefinedTelemetryTrace<Data>) => {
+      trace: <Data>(
+        traceDef: DefinedTelemetryTrace<Data>,
+        context: unknown,
+      ) => {
         const traceId = createTraceId()
-        return createTrace(traceId, traceDef)
+        return createTrace(traceId, traceDef, context)
       },
       log,
     },
