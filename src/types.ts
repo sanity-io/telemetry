@@ -45,7 +45,7 @@ export interface DefinedUserProperties<Schema> {
   schema: Schema
 }
 
-export interface DefinedTelemetryTrace<Data = void> {
+export interface DefinedTelemetryTrace<Data = void, Context = void> {
   type: 'trace'
   /** Unique name of the trace */
   name: string
@@ -55,6 +55,8 @@ export interface DefinedTelemetryTrace<Data = void> {
   description?: string
   /** Data schema. Will not be accessible at runtime */
   schema: Data
+  /** Contextual data schema. Will not be accessible at runtime */
+  context: Context
 }
 
 export interface TelemetryTrace<UserProperties, Data> {
@@ -104,16 +106,17 @@ export type TelemetryUserPropertiesEvent = {
   properties: unknown
 }
 
-export type TelemetryTraceStartEvent = {
+export type TelemetryTraceStartEvent<Context = unknown> = {
   type: 'trace.start'
   name: string // pre-defined event name
   version: number // version of event
   traceId: string
+  context: Context
   sessionId: string
   createdAt: string
 }
 
-export type TelemetryTraceLogEvent<T = unknown> = {
+export type TelemetryTraceLogEvent<T = unknown, Context = unknown> = {
   type: 'trace.log'
   name: string // pre-defined event name
   version: number // version of pre-defined event
@@ -121,8 +124,9 @@ export type TelemetryTraceLogEvent<T = unknown> = {
   sessionId: string
   createdAt: string
   data: T
+  context: Context
 }
-export type TelemetryTraceErrorEvent<T = unknown> = {
+export type TelemetryTraceErrorEvent<T = unknown, Context = unknown> = {
   type: 'trace.error'
   name: string // pre-defined event name
   version: number // version of pre-defined event
@@ -130,8 +134,9 @@ export type TelemetryTraceErrorEvent<T = unknown> = {
   sessionId: string
   createdAt: string
   data: T
+  context: Context
 }
-export type TelemetryTraceCompleteEvent<T = unknown> = {
+export type TelemetryTraceCompleteEvent<T = unknown, Context = unknown> = {
   type: 'trace.complete'
   name: string // pre-defined event name
   version: number // version of pre-defined event
@@ -139,6 +144,7 @@ export type TelemetryTraceCompleteEvent<T = unknown> = {
   sessionId: string
   createdAt: string
   data: T
+  context: Context
 }
 
 export type TelemetryTraceEvent =

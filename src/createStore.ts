@@ -34,6 +34,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       name: telemetryTrace.name,
       version: telemetryTrace.version,
       data: {message: error.message},
+      context: telemetryTrace.context,
       createdAt: new Date().toISOString(),
     })
   }
@@ -65,6 +66,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       type,
       traceId,
       name: telemetryTrace.name,
+      context: telemetryTrace.context,
       version: telemetryTrace.version,
       data,
       createdAt: new Date().toISOString(),
