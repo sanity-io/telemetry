@@ -5,3 +5,4 @@ export * from './utils/browserEvents'
 
 export {defineEvent} from './defineEvent'
 export {defineTrace} from './defineTrace'
+export {noopLogger} from './noopLogger'

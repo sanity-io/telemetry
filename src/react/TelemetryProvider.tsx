@@ -1,15 +1,14 @@
 import type React from 'react'
 import {createContext} from 'react'
 import {TelemetryLogger, TelemetryStore} from '../types'
-import {createNoopLogger} from './noopContext'
 import {useTelemetryStoreLifeCycleEvents} from './useTelemetryStoreLifeCycleEvents'
+import {noopLogger} from '../noopLogger'
 
 /**
  * @internal
  */
-export const TelemetryLoggerContext = createContext<TelemetryLogger<unknown>>(
-  createNoopLogger(),
-)
+export const TelemetryLoggerContext =
+  createContext<TelemetryLogger<unknown>>(noopLogger)
 
 export function TelemetryProvider<UserProperties>({
   children,
