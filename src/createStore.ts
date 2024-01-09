@@ -10,6 +10,7 @@ import {
 import {Observable, Subject} from 'rxjs'
 import {SessionId} from './createSessionId'
 import {createTraceId} from './createTraceId'
+import {trimErrorMessage} from './utils/trimErrorMessage'
 
 /**
  * Bare-bones store for logging and reacting to telemetry events
@@ -34,7 +35,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       traceId,
       name: telemetryTrace.name,
       version: telemetryTrace.version,
-      data: {message: error.message},
+      data: {message: trimErrorMessage(error.message)},
       context,
       createdAt: new Date().toISOString(),
     })
