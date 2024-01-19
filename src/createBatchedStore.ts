@@ -90,9 +90,13 @@ export function createBatchedStore<UserProperties>(
   }
 
   function submit() {
-    return combineLatest([of(consume()), resolveConsent()]).pipe(
+    const pending = consume()
+    if (pending.length === 0) {
+      return EMPTY
+    }
+    return combineLatest([of(pending), resolveConsent()]).pipe(
       mergeMap(([events, consent]) => {
-        if (consent.status !== 'granted') {
+        if (events.length === 0 || consent.status !== 'granted') {
           // consent is not granted, we just consumed (cleared) the buffer so we can return empty
           return EMPTY
         }
