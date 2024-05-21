@@ -1,6 +1,6 @@
 {
   "name": "@sanity/telemetry",
-  "version": "0.7.7",
+  "version": "0.7.8-canary.0",
   "description": "Utils for collecting telemetry data from Sanity CLI and Sanity Studio",
   "keywords": [],
   "homepage": "https://github.com/sanity-io/telemetry#readme",
@@ -75,8 +75,6 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rxjs": "^7.8.1",
     "typeid-js": "^0.3.0"
   },
@@ -99,11 +97,16 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^3.0.0",
     "prettier-plugin-packagejson": "^2.4.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "rimraf": "^5.0.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.5",
     "vite-node": "^0.33.0",
     "vitest": "^0.33.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2"
   },
   "engines": {
     "node": ">=16.0.0"
