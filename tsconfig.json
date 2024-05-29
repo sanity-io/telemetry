@@ -5,6 +5,7 @@
     "rootDir": ".",
     "outDir": "./dist",
     "noEmit": true,
+    "jsx": "react-jsx",
     "paths": {
       "@sanity/telemetry": ["./src"],
       "@sanity/telemetry/events": ["./src/events"],
