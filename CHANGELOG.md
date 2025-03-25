@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/sanity-io/telemetry/compare/v0.8.0...v0.8.1) (2025-03-25)
+
+
+### Bug Fixes
+
+* trigger release automation ([a446bd8](https://github.com/sanity-io/telemetry/commit/a446bd814c5c77ec32c83c97ec92051694460857))
+
 ## [0.8.0](https://github.com/sanity-io/telemetry/compare/v0.7.7...v0.8.0) (2025-03-24)
 
 
