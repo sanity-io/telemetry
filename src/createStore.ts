@@ -1,4 +1,5 @@
 import {
+  DeferredEvent,
   DefinedTelemetryLog,
   DefinedTelemetryTrace,
   TelemetryEvent,
@@ -98,6 +99,19 @@ export function createStore<UserProperties>(sessionId: SessionId): {
     })
   }
 
+  function resumeEvents(events: DeferredEvent[]) {
+    events.forEach((event: DeferredEvent) => {
+      logEntries$.next({
+        sessionId,
+        type: event.event.type,
+        version: event.event.version,
+        name: event.event.name,
+        data: event.data,
+        createdAt: event.createdAt,
+      })
+    })
+  }
+
   function pushUserPropertiesEntry(properties: UserProperties) {
     logEntries$.next({
       sessionId,
@@ -125,6 +139,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
               context,
             )
           },
+          resume: resumeEvents,
           updateUserProperties() {},
           log,
         }
@@ -178,6 +193,7 @@ export function createStore<UserProperties>(sessionId: SessionId): {
       updateUserProperties(properties: UserProperties) {
         pushUserPropertiesEntry(properties)
       },
+      resume: resumeEvents,
       trace: <Data>(
         traceDef: DefinedTelemetryTrace<Data>,
         context: unknown,

@@ -1,11 +1,18 @@
-import {DefinedTelemetryTrace, TelemetryLogger, TelemetryTrace} from './types'
+import {
+  DeferredEvent,
+  DefinedTelemetryTrace,
+  TelemetryLogger,
+  TelemetryTrace,
+} from './types'
 
 function createNoopLogger(): TelemetryLogger<unknown> {
   const logger = {
     updateUserProperties() {},
     trace,
+    resume,
     log,
   }
+
   function trace(
     telemetryTrace: DefinedTelemetryTrace<unknown, unknown>,
   ): TelemetryTrace<unknown, unknown> {
@@ -22,6 +29,7 @@ function createNoopLogger(): TelemetryLogger<unknown> {
   }
 
   function log(event: unknown, data?: unknown) {}
+  function resume(events: DeferredEvent[]) {}
 
   return logger
 }
