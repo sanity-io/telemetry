@@ -116,3 +116,89 @@ test('It logs at most n event every "maxSampleRate"', async () => {
     },
   ])
 })
+
+test('Resuming deferred events', async () => {
+  const sendEvents = vi.fn().mockResolvedValue(undefined)
+  const {logger} = createBatchedStore(createSessionId(), {
+    flushInterval: 100,
+    resolveConsent: () => Promise.resolve({status: 'granted'}),
+    sendEvents,
+  })
+
+  logger.resume([
+    {
+      createdAt: '2024-01-01T00:00:00.000Z',
+      event: ExampleEvent,
+      data: {foo: 'bar'},
+    },
+  ])
+
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
+  expect(sendEvents.mock.calls?.[0]?.[0]).toMatchObject([
+    {
+      name: ExampleEvent.name,
+      sessionId: /.+/,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      data: {foo: 'bar'},
+      type: 'log',
+      version: 1,
+    },
+  ])
+})
+
+test('Resuming multiple deferred events preserves order and timestamps', async () => {
+  const sendEvents = vi.fn().mockResolvedValue(undefined)
+  const {logger} = createBatchedStore(createSessionId(), {
+    flushInterval: 100,
+    resolveConsent: () => Promise.resolve({status: 'granted'}),
+    sendEvents,
+  })
+
+  logger.resume([
+    {
+      createdAt: '2024-01-01T00:00:00.000Z',
+      event: ExampleEvent,
+      data: {foo: 'bar'},
+    },
+    {
+      createdAt: '2024-01-01T00:00:01.000Z',
+      event: ExampleEvent,
+      data: {foo: 'bar'},
+    },
+  ])
+
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
+  const sentEvents = sendEvents.mock.calls?.[0]?.[0]
+  expect(sentEvents).toHaveLength(2)
+  expect(sentEvents[0].createdAt).toBe('2024-01-01T00:00:00.000Z')
+  expect(sentEvents[1].createdAt).toBe('2024-01-01T00:00:01.000Z')
+})
+
+test('Resumed events are batched together with new events', async () => {
+  const sendEvents = vi.fn().mockResolvedValue(undefined)
+  const {logger} = createBatchedStore(createSessionId(), {
+    flushInterval: 100,
+    resolveConsent: () => Promise.resolve({status: 'granted'}),
+    sendEvents,
+  })
+
+  logger.resume([
+    {
+      createdAt: '2024-01-01T00:00:00.000Z',
+      event: ExampleEvent,
+      data: {foo: 'bar'},
+    },
+  ])
+  logger.log(ExampleEvent, {foo: 'bar'})
+
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
+  const sentEvents = sendEvents.mock.calls?.[0]?.[0]
+  expect(sentEvents).toHaveLength(2)
+  // Resumed event preserves original timestamp
+  expect(sentEvents[0].createdAt).toBe('2024-01-01T00:00:00.000Z')
+  // New event has a fresh timestamp
+  expect(sentEvents[1].createdAt).not.toBe('2024-01-01T00:00:00.000Z')
+})
