@@ -74,13 +74,11 @@
     ]
   },
   "dependencies": {
-    "lodash": "^4.17.21",
     "rxjs": "^7.8.1",
     "typeid-js": "^0.3.0"
   },
   "devDependencies": {
     "@sanity/pkg-utils": "^2.3.4",
-    "@types/lodash": "^4.14.195",
     "@types/node": "^18.16.16",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
@@ -108,11 +106,11 @@
   "peerDependencies": {
     "react": "^18.2 || ^19.0.0"
   },
+  "packageManager": "pnpm@10.6.5",
   "engines": {
     "node": ">=16.0.0"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "packageManager": "pnpm@10.6.5"
+  }
 }
