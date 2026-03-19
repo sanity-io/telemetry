@@ -1,7 +1,11 @@
-import {ReactNode} from 'react'
-import type {TelemetryEvent} from '@sanity/telemetry'
+import {ReactNode, useEffect, useState} from 'react'
+import type {TelemetryEvent, TelemetryStore} from '@sanity/telemetry'
 import {createBatchedStore, createSessionId} from '@sanity/telemetry'
-import {TelemetryProvider} from '@sanity/telemetry/react'
+import {
+  DeferredTelemetryProvider,
+  TelemetryProvider,
+  useTelemetry,
+} from '@sanity/telemetry/react'
 import {StudioMount} from './studio.telemetry'
 
 // Implementation of this could look at env vars, project consent, etc
@@ -29,19 +33,56 @@ function sendEvents(url: string, entries: TelemetryEvent[]) {
 
 const apiUrl = 'http://localhost:5001/vX/intake/batch'
 
-const sessionId = createSessionId()
-const store = createBatchedStore(sessionId, {
-  flushInterval: 1000 * 10,
-  resolveConsent,
-  sendEvents: (events) => sendEvents(apiUrl, events),
-  sendBeacon: (events: TelemetryEvent[]) => sendBeacon(apiUrl, events),
-})
+function useStore(): TelemetryStore<unknown> | undefined {
+  const [store, setStore] = useState<TelemetryStore<unknown>>()
+
+  useEffect(() => {
+    // Simulate async store creation (e.g. waiting for auth/consent)
+    const timeout = setTimeout(() => {
+      const sessionId = createSessionId()
+      setStore(
+        createBatchedStore(sessionId, {
+          flushInterval: 1000 * 10,
+          resolveConsent,
+          sendEvents: (events) => sendEvents(apiUrl, events),
+          sendBeacon: (events: TelemetryEvent[]) =>
+            sendBeacon(apiUrl, events),
+        }),
+      )
+    }, 2000)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  return store
+}
+
+// Logs a startup event using useTelemetry() — this fires before
+// the real store is ready, so events are buffered by DeferredTelemetryProvider
+function StartupLogger({children}: {children: ReactNode}) {
+  const logger = useTelemetry()
+
+  useEffect(() => {
+    logger.log(StudioMount, {
+      pluginVersions: [{pluginName: 'example-plugin', version: 'v2.1.0'}],
+      studioVersion: 'v3.12.0',
+    })
+  }, [logger])
+
+  return <>{children}</>
+}
 
 export function Root({children}: {children: ReactNode}) {
-  store.logger.log(StudioMount, {
-    pluginVersions: [{pluginName: 'example-plugin', version: 'v2.1.0'}],
-    studioVersion: 'v3.12.0',
-  })
+  const store = useStore()
 
-  return <TelemetryProvider store={store}>{children}</TelemetryProvider>
+  return (
+    <DeferredTelemetryProvider>
+      <StartupLogger>
+        {store ? (
+          <TelemetryProvider store={store}>{children}</TelemetryProvider>
+        ) : (
+          children
+        )}
+      </StartupLogger>
+    </DeferredTelemetryProvider>
+  )
 }

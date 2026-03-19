@@ -26,7 +26,7 @@ import {createStore} from './createStore'
 const unrefTimer = (ms: number) =>
   new Observable((subscriber) => {
     const timeout = setTimeout(() => {
-      subscriber.next()
+      subscriber.next(undefined)
       subscriber.complete()
     }, ms)
     if (typeof timeout.unref === 'function') {

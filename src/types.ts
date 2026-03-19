@@ -82,11 +82,22 @@ export interface TelemetryTrace<UserProperties, Data> {
   await<P extends Promise<unknown>>(promise: P, finalData: Data): P
 }
 
+export interface DeferredEvent<
+  Data = unknown,
+  Event extends DefinedTelemetryLog<Data> = DefinedTelemetryLog<Data>,
+> {
+  createdAt: string
+  event: Event
+  data: Data
+}
+
 /**
  * Note that `sessionId` is removed from the signature of these functions
  */
 export interface TelemetryLogger<UserProperties> {
   updateUserProperties(properties: UserProperties): void
+
+  resume(events: DeferredEvent[]): void
 
   /*
    * Log a single event, typically a user action, e.g. "Publish"-button clicked
