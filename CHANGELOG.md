@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/sanity-io/telemetry/compare/v0.8.1...v0.9.0) (2026-03-19)
+
+
+### Features
+
+* support resuming deferred events ([#25](https://github.com/sanity-io/telemetry/issues/25)) ([bd25b65](https://github.com/sanity-io/telemetry/commit/bd25b652c7dd4647bc7a061624a4d11af0cc473e))
+
 ## [0.8.1](https://github.com/sanity-io/telemetry/compare/v0.8.0...v0.8.1) (2025-03-25)
 
 
