@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://github.com/sanity-io/telemetry/compare/v0.9.0...v1.0.0) (2026-03-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* move out of 0.x range ([#29](https://github.com/sanity-io/telemetry/issues/29))
+
+### Bug Fixes
+
+* move out of 0.x range ([#29](https://github.com/sanity-io/telemetry/issues/29)) ([29332d6](https://github.com/sanity-io/telemetry/commit/29332d6c3cc6e4979bf657edb9c8212a4478b80f))
+
 ## [0.9.0](https://github.com/sanity-io/telemetry/compare/v0.8.1...v0.9.0) (2026-03-19)
 
 
