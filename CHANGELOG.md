@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/sanity-io/telemetry/compare/v1.0.0...v1.1.0) (2026-04-27)
+
+
+### Features
+
+* mark react as optional peer dependency ([#33](https://github.com/sanity-io/telemetry/issues/33)) ([20a1656](https://github.com/sanity-io/telemetry/commit/20a1656cacbd045266bb7a3e9e85b7c9aeb87fd5))
+
 ## [1.0.0](https://github.com/sanity-io/telemetry/compare/v0.9.0...v1.0.0) (2026-03-31)
 
 
