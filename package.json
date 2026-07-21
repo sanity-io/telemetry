@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "rxjs": "^7.8.1",
-    "typeid-js": "^0.3.0"
+    "typeid-js": "^1.2.0"
   },
   "devDependencies": {
     "@sanity/pkg-utils": "^2.3.4",
