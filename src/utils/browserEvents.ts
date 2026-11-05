@@ -15,7 +15,7 @@ export function onPageHide(listener: () => void) {
   // only register beforeunload/unload in browsers that don't support
   // pagehide to avoid breaking bfcache
   const cleanupUnload = listen(window, 'unload', listener)
-  const cleanupBeforeUnload = listen(window, 'unload', listener)
+  const cleanupBeforeUnload = listen(window, 'beforeunload', listener)
   return () => {
     cleanupUnload()
     cleanupBeforeUnload()
