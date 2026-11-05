@@ -131,20 +131,82 @@ export function createBatchedStore<UserProperties>(
   }
 
   // start subscribing to events
-  const subscription = flush$.subscribe()
+  let subscription = flush$.subscribe()
+  let beaconMode = false
+  let ended = false
+  let cancelBeaconWindow: (() => TelemetryEvent[]) | undefined
 
   function endWithBeacon() {
-    if (!options.sendBeacon) {
+    if (ended) {
+      return true
+    }
+    const sendBeacon = options.sendBeacon
+    if (!sendBeacon) {
       // we don't have a beacon strategy, so we just flush - this may make us lose events, but it's the best we can do
       end()
       return true
     }
+    if (beaconMode) {
+      return true
+    }
+    beaconMode = true
     const events = consume()
     subscription.unsubscribe()
-    return events.length > 0 ? options.sendBeacon(events) : true
+
+    const lateEvents: TelemetryEvent[] = []
+    let sendingLateBatch = false
+    let scheduled = false
+
+    function sendLateBatch(pending: TelemetryEvent[]) {
+      sendingLateBatch = true
+      try {
+        sendBeacon?.(pending)
+      } catch {
+        // A failed final send is dropped; it must not escape the microtask.
+      } finally {
+        sendingLateBatch = false
+      }
+    }
+
+    const lateSubscription = store.events$.subscribe((event) => {
+      lateEvents.push(event)
+      // Re-entrant logs wait for the closing task instead of spinning microtasks.
+      if (!sendingLateBatch && !scheduled) {
+        scheduled = true
+        queueMicrotask(() => {
+          scheduled = false
+          if (beaconMode && !ended && lateEvents.length > 0) {
+            sendLateBatch(lateEvents.splice(0))
+          }
+        })
+      }
+    })
+
+    const timeout = setTimeout(() => {
+      const pending = cancelWindow()
+      if (!ended) {
+        subscription = flush$.subscribe()
+        if (pending.length > 0) {
+          sendLateBatch(pending)
+        }
+      }
+    }, 0)
+
+    function cancelWindow() {
+      clearTimeout(timeout)
+      lateSubscription.unsubscribe()
+      beaconMode = false
+      cancelBeaconWindow = undefined
+      return lateEvents.splice(0)
+    }
+
+    cancelBeaconWindow = cancelWindow
+    return events.length > 0 ? sendBeacon(events) : true
   }
 
   function end() {
+    ended = true
+    _buffer.push(...(cancelBeaconWindow?.() ?? []))
     // flush before destroying
     return flush()
       .then(
